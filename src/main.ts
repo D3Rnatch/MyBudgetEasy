@@ -1,11 +1,12 @@
 import { createApp } from 'vue'
 import { VueFire, VueFireAuth } from 'vuefire'
 import { initializeApp } from 'firebase/app'
+import { createPinia } from 'pinia'
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
-import store from './store'
 
 // Vuetify
 import 'vuetify/styles'
@@ -31,17 +32,21 @@ const firebaseConfig = {
   
 const firebaseApp = initializeApp(firebaseConfig)
 
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedState)
+
 const vuetify = createVuetify({
     components,
     directives,
   })
 
 const app = createApp(App)
-app.use(store).use(router).use(VueFire, {
+app.use(router).use(VueFire, {
     // imported above but could also just be created here
     firebaseApp,
     modules: [
         VueFireAuth(),
     ],
-}).use(vuetify)
+}).use(vuetify).use(pinia)
+
 app.mount('#app')

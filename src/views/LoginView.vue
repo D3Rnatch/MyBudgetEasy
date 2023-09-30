@@ -10,7 +10,7 @@
             </v-card-title>
 
             
-            <LoginForm @signInSuccess="goToAppPage()"></LoginForm>
+            <LoginForm @signInSuccess="prepareAndGoToAppPage()"></LoginForm>
         </v-card>
     </div>
 </template>
@@ -19,18 +19,24 @@
     import LoginForm from '@/components/LoginForm.vue'; // @ is an alias to /src
     import { useRouter } from 'vue-router'
     import { useFirebaseAuth } from 'vuefire';
+    import { useGlobalStore } from '@/store/globalStore'
 
     const router = useRouter()
-    
+    const store = useGlobalStore()
     const auth = useFirebaseAuth() // only exists on client side
 
-    // check if user is logged-in or not
-    if(auth.currentUser) {
+    if(store.authenticated && store.auth_userid)
+    {
         goToAppPage();
     }
 
+    function prepareAndGoToAppPage(){
+        store.authenticated = true
+        store.auth_userid = auth.currentUser.uid
+        goToAppPage()
+    }
+
     function goToAppPage() {
-        console.log("going account")
         router.replace('account')
     }
 

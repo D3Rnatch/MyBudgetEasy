@@ -5,13 +5,20 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { defineComponent } from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-export default defineComponent({
+/*export default defineComponent({
   name: 'HomeView',
   components: {
     HelloWorld,
   },
-});
+}); */
+
+import { useGlobalStore } from '@/store/globalStore'
+
+const store = useGlobalStore()
+
+console.log("Is User authenticated " + store.authenticated)
+
 </script>
