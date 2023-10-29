@@ -1,23 +1,9 @@
 import { useCollection, useFirestore } from 'vuefire'
 import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
-import { converter } from '@/dao/DAOUtils'
+import { converter, tsConverter } from '@/dao/DAOUtils'
 
-export interface DBItem
-{
-    timestamp:any
-}
+import { Account, Category } from '@/store/accountModel'
 
-export interface Category extends DBItem
-{
-    color:string
-    title:string
-}
-
-export interface Account extends DBItem
-{
-    name:string
-    users:string[]
-}
 
 enum PathTypes {
     Categories,
@@ -39,8 +25,8 @@ enum PathTypes {
 export class AccountDAO
 {
     private db_: Firestore
-    private accountCollectionName_:string = "accounts"
-    private categoryCollectionName_:string = "categories"
+    private accountCollectionName_ = "accounts"
+    private categoryCollectionName_ = "categories"
 
     constructor()
     {
@@ -64,8 +50,9 @@ export class AccountDAO
     * @param account A complete Account Object
     * @return Account key value
     */
-    public addAccount(account:Account):string
+    public addAccount(accountCls:Account):string
     {
+        const account = tsConverter<Account>().from(accountCls)
         account.timestamp = serverTimestamp()
         const localDocRef = doc(collection(this.db_, this.buildPaths(PathTypes.Account, "")).withConverter<Account, DocumentData>(converter<Account>()))
         setDoc(localDocRef, account)
@@ -81,7 +68,7 @@ export class AccountDAO
     {
         for(let i=0; i< categories.length; ++i)
         {
-            let cat = categories[i]
+            const cat = categories[i]
             cat.timestamp = serverTimestamp()
             addDoc(collection(this.db_, this.buildPaths(PathTypes.Categories, accountId))
                                 .withConverter<Category, DocumentData>(converter<Category>()), cat)

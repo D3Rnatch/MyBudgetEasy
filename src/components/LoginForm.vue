@@ -6,6 +6,7 @@
           v-model="userName"
           required
           clearable
+          clear-icon="mdi-close"
           variant="solo-filled"
           class="mb-2"
           :rules="emailRules"
@@ -16,6 +17,7 @@
           v-model="password"
           required
           clearable
+          clear-icon="mdi-close"
           variant="solo-filled"
           class="mb-2"
           :rules="pwdRules"

@@ -27,7 +27,11 @@
 
     if(store.authenticated && store.auth_userid)
     {
-        goToAppPage();
+        // Temporary removed until authentication through cookies is working.
+        // store.authenticated = false
+        // store.auth_userid = ""
+        // Check User still exists on database.
+        // goToAppPage();
     }
 
     function prepareAndGoToAppPage(){

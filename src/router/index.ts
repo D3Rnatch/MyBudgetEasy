@@ -10,23 +10,29 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/account',
     name: 'account',
+    beforeEnter: (to, from) => {
+      // reject the navigation
+      return true
+    },
     component: () => import(/* webpackChunkName: "account" */ '../views/HomeView.vue')
   },
   {
     path: '/about',
     name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
+    beforeEnter: (to, from) => {
+      // reject the navigation
+      return true
+    },
     component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
   },  
   {
     path: '/create-account',
     name: 'create-account',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "CreateAccount" */ '../views/CreateAccountView.vue')
+    beforeEnter: (to, from) => {
+      // reject the navigation
+      return true
+    },
+    component: () => import(/* webpackChunkName: "CreateAccount" */ '../views/CreateAccountView.vue'),
   }
 ]
 
