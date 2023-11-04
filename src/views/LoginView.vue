@@ -41,7 +41,6 @@
     }
 
     function goToAppPage() {
-        router.replace('account')
+        router.replace('account/dashboard') // Will load the default Account
     }
-
 </script>

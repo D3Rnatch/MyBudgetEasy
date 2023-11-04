@@ -17,22 +17,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "account" */ '../views/HomeView.vue')
   },
   {
-    path: '/about',
-    name: 'about',
+    path: '/account/dashboard',
+    name: 'dashboard',
     beforeEnter: (to, from) => {
       // reject the navigation
       return true
     },
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  },  
-  {
-    path: '/create-account',
-    name: 'create-account',
-    beforeEnter: (to, from) => {
-      // reject the navigation
-      return true
-    },
-    component: () => import(/* webpackChunkName: "CreateAccount" */ '../views/CreateAccountView.vue'),
+    component: () => import(/* webpackChunkName: "about" */ '../views/AccountSummaryView.vue')
   }
 ]
 

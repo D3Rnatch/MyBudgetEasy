@@ -13,6 +13,8 @@ export interface AccountData {
     tmpAccount: Account
     tmpCategories: Category[]
     currentUser: User
+    currentAccount: Account
+    currentCategories: Category[]
 }
 
 export const useGlobalStore = defineStore('global', {
@@ -30,8 +32,10 @@ export const useAccountDataStore = defineStore('accountData', {
     state: () : AccountData => {
         return {
             tmpAccount: new AccountImpl,
+            tmpCategories: [],
             currentUser: new UserImpl,
-            tmpCategories: []
+            currentAccount: null,
+            currentCategories: null,
         }
     }
 })
