@@ -3,14 +3,14 @@
         <v-container> 
             <v-row align="start" justify="start" no-gutters>
                 <v-col align-self="start">
-                    <v-sheet class="pl-0 ml-n2 mt-5">
+                    <p class="pl-0 ml-n2 mt-5">
                         {{ props.title }} 
-                    </v-sheet>
+                    </p>
                 </v-col>
                 <v-col>
-                    <v-sheet class="pl-0 ml-n2 mt-5">
+                    <p class="pl-0 ml-n2 mt-5">
                         {{props.amount}}€ / {{props.max}}€
-                    </v-sheet>
+                    </p>
                 </v-col>
                 <v-col></v-col>
                 <v-col></v-col>

@@ -1,24 +1,17 @@
 <template>
-    <v-card
-        class="mx-auto bg-secondary-30"
-        max-width="400"
-        variant="tonal"
-    >
-        <v-card-title>
-            Categories Overview
-        </v-card-title>
-        <v-card-text>
-            <v-virtual-scroll
+    <div class="d-flex flex-column ma-4 pa-4">
+        <p class="text-h6">Categories</p>
+        <v-divider class="border-opacity-100"></v-divider>
+        <v-virtual-scroll
                 :items="props.categories"
-                height="320"
+                height="100%"
                 item-height="48"
             >
             <template v-slot:default="{ item }">
                 <UIAccountOverviewItem :title="item.title" :amount="item.amount" :max="item.max" :color="item.color"></UIAccountOverviewItem>
             </template>
-            </v-virtual-scroll>
-        </v-card-text>
-    </v-card>
+        </v-virtual-scroll>
+    </div>
 </template>
 
 
