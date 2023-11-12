@@ -17,8 +17,10 @@
                     </v-tab>
                 </v-tabs>
             </template>
-            <v-icon :icon="'mdi-account-circle'"></v-icon>
-            {{ currentUser }}
+            <div class="d-flex">
+                <v-icon :icon="'mdi-account-circle'" class="ma-4 mr-0"></v-icon>
+                <p class="ma-4">{{ currentUser }}</p>
+            </div>
         </v-app-bar>
         <v-main>
                 <v-container>
@@ -43,7 +45,7 @@
                                     ></v-combobox>
                                     <div class="d-flex flex-row pa-6 justify-end">
                                                 <v-btn density="comfortable" icon="mdi-magnify" class="d-flex mr-2 mb-4"></v-btn>
-                                                <v-btn density="comfortable" icon="mdi-plus" class="d-flex mr-2 mb-4"></v-btn>
+                                                <v-btn density="comfortable" icon="mdi-plus" class="d-flex mr-2 mb-4" @click="addExpense = true"></v-btn>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-column">
@@ -70,6 +72,7 @@
                 </v-container>
         </v-main>
     </v-layout>
+    <EditExpenseItemDialog v-model="addExpense" :edit=false></EditExpenseItemDialog>
 </template>
 
 <script setup lang="ts">
@@ -78,11 +81,12 @@ import UIAccountSummary from '@/widgets/UIAccountSummary.vue';
 import UIAccountOverview from '@/widgets/UIAccountOverview.vue';
 import UIAccountExpenseList from '@/widgets/UIAccountExpenseList.vue';
 import { ref, computed } from 'vue';
+import EditExpenseItemDialog from '@/components/EditExpenseItemDialog.vue';
 
 const selectedFilter = ref("Past Month")
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
-
+const addExpense = ref(false)
 const categories = ref([
     {title: "Title1", color:"#0c0c0c", max:253, amount: 300},
     {title: "Title2", color:"cyan", max:278, amount: 90},
@@ -127,6 +131,12 @@ const itemsPerPageFilters = ref([
 const selectedItemsPerPageFilter = ref("30")
 
 const numberOfPages = ref(4)
+
+const isValid = ref(false)
+
+function itemStatusChanged(status:boolean){
+    isValid.value = status
+}
 
 function deleteExpense(){
     console.log("delete clicked")
