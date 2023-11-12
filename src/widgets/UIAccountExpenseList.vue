@@ -2,6 +2,7 @@
     <v-list
         open-strategy="single"
         class="flex"
+        max-height=500
     >
         <v-list-group v-for="(item, i) in props.items" :key="i" :value="i" color="primary">
             <template v-slot:activator="{ props }">
