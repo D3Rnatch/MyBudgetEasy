@@ -19,13 +19,7 @@
 
 import UIAccountOverviewItem from '@/widgets/items/UIAccountOverviewItem.vue'
 import { defineProps } from 'vue';
-
-interface Category {
-    title: string,
-    color: string,
-    max: number,
-    amount: number
-}
+import { Category } from '@/model/componentModel'
 
 const props = defineProps<{
     categories?: Category[]

@@ -10,25 +10,32 @@ import router from './router'
 
 // Vuetify
 import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
+import { createVuetify, ThemeDefinition } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import '@mdi/font/css/materialdesignicons.css' // Ensure you are using css-loader
+import {
+  VDataTable,
+  VDataTableServer,
+  VDataTableVirtual,
+} from "vuetify/labs/VDataTable";
+import { md3 } from 'vuetify/blueprints'
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyAorv0-DXE2CRNbAjNHQfVsyd2JZW3DrnM",
-  
-    authDomain: "testdb-adcf5.firebaseapp.com",
-  
-    projectId: "testdb-adcf5",
-  
-    storageBucket: "testdb-adcf5.appspot.com",
-  
-    messagingSenderId: "530511048231",
-  
-    appId: "1:530511048231:web:5d0b49518b48b67f2ba802"
-  
-  };
+  apiKey: "AIzaSyAHBnEfXzOlGPRhwFXtd6AFxANXWzbUwuk",
+
+  authDomain: "mybudgeteasybackend.firebaseapp.com",
+
+  projectId: "mybudgeteasybackend",
+
+  storageBucket: "mybudgeteasybackend.appspot.com",
+
+  messagingSenderId: "616720153121",
+
+  appId: "1:616720153121:web:6a62334dc970a329548160"
+
+};
   
 const firebaseApp = initializeApp(firebaseConfig)
 
@@ -38,7 +45,11 @@ pinia.use(piniaPluginPersistedState)
 const vuetify = createVuetify({
     components,
     directives,
-  })
+    icons: {
+        defaultSet: 'mdi'
+    },
+    blueprint: md3,
+})
 
 const app = createApp(App)
 app.use(router).use(VueFire, {

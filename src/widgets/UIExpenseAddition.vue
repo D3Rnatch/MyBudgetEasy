@@ -35,18 +35,7 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps, computed } from 'vue'
-
-interface Category {
-    title: string
-    color: string
-    max:number
-    amount:number
-}
-
-interface ExpenseSubItem {
-    amount:number
-    category:string
-}
+import { Category, ExpenseSubItem } from '@/model/componentModel'
 
 interface Props {
     modelValue:ExpenseSubItem[]

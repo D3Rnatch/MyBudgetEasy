@@ -46,7 +46,7 @@ width="1024"
                             </p>
                         </v-col>
                         <v-col>
-                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="amounts" :categories="categories"></UIExpenseAddition>
+                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="currentItem.amounts" :categories="categories"></UIExpenseAddition>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -54,7 +54,7 @@ width="1024"
             <v-container fluid>
                 <v-row>
                     <v-col>
-                        <v-btn color="primary" block @click="value = false" class="w-50" :disabled="!isValid">Save</v-btn>
+                        <v-btn color="primary" block @click="onSave" class="w-50" :disabled="!isValid">Save</v-btn>
                     </v-col>
                     <v-col>
                         <v-btn color="primary" block @click="value = false">Cancel</v-btn>
@@ -70,48 +70,16 @@ width="1024"
 <script setup lang="ts">
 import { defineProps, computed, defineEmits, ref, watch } from 'vue'
 import UIExpenseAddition from '@/widgets/UIExpenseAddition.vue';
+import { ExpenseItemImpl, Category, ExpenseSubItem, ExpenseItem } from '@/model/componentModel'
 
 //*************************************** */
 // Component interface definition
-interface Category {
-    title: string,
-    color: string,
-    max: number,
-    amount: number
-}
-
-interface ExpenseSubItem {
-    amount:number
-    category:string
-}
-
-interface ExpenseItem {
-    date:string
-    totalAmount:number
-    amounts: ExpenseSubItem[]
-    description:string
-    id:number
-    user:string
-}
-
-interface User {
-    uid:string
-    name:string
-}
-
-interface PropsInterface {
-    categories?: Category[]
-    expense?:ExpenseItem
-    users?:string[]
-}
-
-const props = defineProps<{ modelValue:boolean, edit:boolean, index?:number }>()
-const emit = defineEmits(['update:modelValue'])
+const props = defineProps<{ modelValue:boolean, edit:boolean, item?:ExpenseItem }>()
+const emit = defineEmits(['update:modelValue', 'update:item'])
 
 
 //*************************************** */
 // Ref definition
-const amounts = ref<ExpenseSubItem[]>([])
 const currentItem = ref({date:"", totalAmount:0, description:"", user:"", id:0, amounts:[]})
 
 const pwdRules = [
@@ -160,17 +128,69 @@ const isValid = computed(() => {
 //*************************************** */
 // Component methods
 
+watch(selectedUser, () => {
+    currentItem.value.user = selectedUser.value.title
+})
+
+watch(value, () => {
+    // Tracks when this is displayed or hidden
+    console.log("Watch Value value.value " + (value.value === true) + ", edit " + (props.edit === true)
+                    + ", item " + (props.item)
+    )
+
+    if(props.edit)
+    {
+        if(value.value)
+        {
+            console.log("Setting up edition ON")
+            currentItem.value = structuredClone(props.item);
+            console.log("Setting up edition END")
+        }
+    }
+    else
+    {
+        if(!value.value)
+        {
+            console.log("restoring to default ON")
+            currentItem.value = (new ExpenseItemImpl as ExpenseItem)
+            currentItem.value.user = users.value.at(0).title
+            console.log("restoring to default END is amounts valid " + currentItem.value.totalAmount)
+        }
+    }
+
+/*    if(value.value && props.edit && props.item)
+    {
+        // When displaying the popup,
+        currentItem.value = structuredClone(props.item);
+    }
+    /*else if(!value.value)
+    {
+        console.log("TEST 2a")
+        // Clear all fields
+        currentItem.value.amounts = []
+        currentItem.value.date = ""
+        currentItem.value.description = ""
+        currentItem.value.id = -1
+        currentItem.value.totalAmount = 0
+        currentItem.value.user = users.value.at(0).title
+        console.log("TEST 2b")
+    } */
+})
+
+function onSave()
+{
+    emit('update:item', currentItem.value)
+    value.value = false
+}
+
 function increaseTotalAmount(amount:number)
 {
     currentItem.value.totalAmount += amount
-    console.log("amounts " + amounts.value.length)
 }
 
 function decreaseTotalAmount(amount:number)
 {
     currentItem.value.totalAmount -= amount
-    console.log("total " + currentItem.value.totalAmount + " amount " + amount)
-    console.log("amounts " + amounts.value.length)
 }
 
 </script>
