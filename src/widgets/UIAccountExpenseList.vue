@@ -54,7 +54,7 @@ function onSelected(index:number, data:ExpenseItem)
 
     if(replace)
     {
-        selected.value = { index:index, data:data }
+        selected.value = { index:index, data:props.items.at(index) }
         console.log("Selected " + index)
         emit('update:modelValue', selected.value)
     }

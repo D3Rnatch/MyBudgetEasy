@@ -96,7 +96,7 @@ function onDelete(){
 }
 
 watch(selectedItem, () => {
-    console.log("Is SelectedItem defined " + (selectedItem.value.data ? "yes " :  "no ") + selectedItem.value.index)
+    console.log("Is SelectedItem defined " + selectedItem.value.data.description)
 })
 
 </script>

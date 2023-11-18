@@ -80,7 +80,7 @@ const emit = defineEmits(['update:modelValue', 'update:item'])
 
 //*************************************** */
 // Ref definition
-const currentItem = ref({date:"", totalAmount:0, description:"", user:"", id:0, amounts:[]})
+const currentItem = ref(new ExpenseItemImpl as ExpenseItem)
 
 const pwdRules = [
     value => {
@@ -113,6 +113,16 @@ const value = computed({
   set(value) {
     emit('update:modelValue', value)
   }
+})
+
+const inputItem = computed({
+    get() {
+    return props.item
+  },
+  set(value) {
+    emit('update:item', value)
+  }
+
 })
 
 const isValid = computed(() => {
@@ -179,7 +189,8 @@ watch(value, () => {
 
 function onSave()
 {
-    emit('update:item', currentItem.value)
+    inputItem.value = currentItem.value
+    emit('update:item', inputItem.value)
     value.value = false
 }
 

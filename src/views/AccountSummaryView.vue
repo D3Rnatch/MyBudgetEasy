@@ -1,7 +1,7 @@
 <template>
     <v-layout class="rounded rounded-md">
         <v-app-bar color="secondary-darken-1">
-            <v-app-bar-nav-icon></v-app-bar-nav-icon>
+            <v-app-bar-nav-icon @click="drawerOpening = !drawerOpening"></v-app-bar-nav-icon>
             <v-toolbar-title>{{ accountName }}</v-toolbar-title>
             <template v-slot:extension>
                 <v-tabs
@@ -22,6 +22,33 @@
                 <p class="ma-4">{{ currentUser }}</p>
             </div>
         </v-app-bar>
+        <v-navigation-drawer
+            v-model="drawerOpening"
+            width="300"
+            temporary
+        >
+            <div class="d-flex flex-row justify-space-between">
+                <v-list-item
+                    prepend-icon="mdi-account-circle"
+                    :title="currentUser"
+                ></v-list-item>
+                <v-btn density="comfortable" icon="mdi-plus"></v-btn>
+            </div>
+
+            <v-divider></v-divider>
+
+            <v-list density="compact" nav>
+                <v-list-item v-for="(item, i) in accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item">
+                </v-list-item>
+            </v-list>
+            <template v-slot:append>
+                <div class="pa-2">
+                <v-btn prepend-icon="mdi-logout">
+                    Logout
+                </v-btn>
+                </div>
+            </template>
+        </v-navigation-drawer>
         <v-main>
             <v-window v-model="tab">
                 <v-window-item value=0>
@@ -49,11 +76,18 @@ import { ref, computed } from 'vue';
 
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
+const drawerOpening = ref(false)
 
 const tab = ref("Expenses")
 
 const tabs = ref([
     "Detailed", "Summary", "Account Setup", "Exports"
+])
+
+const accounts = ref([
+    "AB_SB_MainAccount",
+    "MyBudget",
+    "VacAvecLesPotos"
 ])
 
 </script>
