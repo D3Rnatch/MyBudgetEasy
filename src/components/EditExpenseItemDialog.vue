@@ -167,24 +167,6 @@ watch(value, () => {
             console.log("restoring to default END is amounts valid " + currentItem.value.totalAmount)
         }
     }
-
-/*    if(value.value && props.edit && props.item)
-    {
-        // When displaying the popup,
-        currentItem.value = structuredClone(props.item);
-    }
-    /*else if(!value.value)
-    {
-        console.log("TEST 2a")
-        // Clear all fields
-        currentItem.value.amounts = []
-        currentItem.value.date = ""
-        currentItem.value.description = ""
-        currentItem.value.id = -1
-        currentItem.value.totalAmount = 0
-        currentItem.value.user = users.value.at(0).title
-        console.log("TEST 2b")
-    } */
 })
 
 function onSave()

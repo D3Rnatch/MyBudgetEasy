@@ -32,13 +32,13 @@
                     prepend-icon="mdi-account-circle"
                     :title="currentUser"
                 ></v-list-item>
-                <v-btn density="comfortable" icon="mdi-plus"></v-btn>
+                <v-btn density="comfortable" icon="mdi-plus" @click="addAccountFlag = true"></v-btn>
             </div>
 
             <v-divider></v-divider>
 
             <v-list density="compact" nav>
-                <v-list-item v-for="(item, i) in accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item">
+                <v-list-item v-for="(item, i) in accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item" @click="action(item, i)">
                 </v-list-item>
             </v-list>
             <template v-slot:append>
@@ -66,13 +66,16 @@
             </v-window>
         </v-main>
     </v-layout>
+    <AddAccountDialog v-model:openFlag="addAccountFlag" v-model:account="account" v-model:categories="categories"></AddAccountDialog>
 </template>
 
 <script setup lang="ts">
 
 import AccountDetails from '@/components/AccountDetails.vue';
 import AccountSummary from '@/components/AccountSummary.vue';
-import { ref, computed } from 'vue';
+import AddAccountDialog from '@/components/AddAccountDialog.vue';
+import { ref, watch } from 'vue';
+import { Category, Account } from '@/model/componentModel'
 
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
@@ -89,5 +92,22 @@ const accounts = ref([
     "MyBudget",
     "VacAvecLesPotos"
 ])
+
+const addAccountFlag = ref(false)
+
+const account = ref<Account>()
+const categories = ref<Category[]>()
+
+function action(item:string, index:number)
+{
+    console.log("action clicked for " + item)
+}
+
+watch(account, () => {
+    if(account.value)
+    {
+        console.log("Assigned to " + account.value.name)
+    }
+})
 
 </script>

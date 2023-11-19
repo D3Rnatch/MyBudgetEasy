@@ -1,35 +1,35 @@
 <template>
-        <!-- Defines the input to add an expense with input button -->
-        <div class="d-flex flex-row">
-            <v-text-field
-                label="Expense amount"
-                v-model="newAmount"
-                class="mr-2"
-                clearable
-                clear-icon="mdi-close"
-                variant="solo-filled"
-            ></v-text-field>
-            <v-combobox
-                label="Category"
-                :items="props.categories"
-                class="ml-2 mr-2"
-                v-model="currentCategory"
-            />
-            <v-btn density="comfortable" icon="mdi-plus" class="ma-0 mt-3" @click="add" :disabled="!conditionValid"></v-btn>
-        </div>
-        <v-list height="195" bg-color="grey-lighten-2">
-            <v-list-item v-for="(item, index) in value" :key="index">
-                <v-list-item-title>
-                    {{ item.amount }} €
-                </v-list-item-title>
-                <template v-slot:subtitle>
-                    {{ item.category }}
-                </template>
-                <template v-slot:append>
-                        <v-icon :icon="'mdi-delete'" @click="remove(index)"></v-icon>
-                </template>
-            </v-list-item>
-        </v-list>
+    <!-- Defines the input to add an expense with input button -->
+    <div class="d-flex flex-row">
+        <v-text-field
+            label="Expense amount"
+            v-model="newAmount"
+            class="mr-2"
+            clearable
+            clear-icon="mdi-close"
+            variant="solo-filled"
+        ></v-text-field>
+        <v-combobox
+            label="Category"
+            :items="props.categories"
+            class="ml-2 mr-2"
+            v-model="currentCategory"
+        />
+        <v-btn density="comfortable" icon="mdi-plus" class="ma-0 mt-3" @click="add" :disabled="!conditionValid"></v-btn>
+    </div>
+    <v-list height="195" bg-color="grey-lighten-2">
+        <v-list-item v-for="(item, index) in value" :key="index">
+            <v-list-item-title>
+                {{ item.amount }} €
+            </v-list-item-title>
+            <template v-slot:subtitle>
+                {{ item.category }}
+            </template>
+            <template v-slot:append>
+                    <v-icon :icon="'mdi-delete'" @click="remove(index)"></v-icon>
+            </template>
+        </v-list-item>
+    </v-list>
 </template>
 
 

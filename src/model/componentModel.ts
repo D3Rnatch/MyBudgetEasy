@@ -1,14 +1,32 @@
 
 export interface Category {
+    uid: string // Left empty up until registered to db
     title: string
     color: string
     max:number
     amount:number
 }
 
+export class CategoryImpl implements Category {
+    uid: string // Left empty up until registered to db
+    title: string
+    color: string
+    max:number
+    amount:number
+
+    constructor()
+    {
+        this.uid = ""
+        this.title = ""
+        this.color = ""
+        this.max = 0
+        this.amount = 0
+    }
+}
+
 export interface ExpenseSubItem {
     amount:number
-    category:string
+    category:string // Maps to UID of Category (not its title)
 }
 
 export interface ExpenseItem {
@@ -56,5 +74,29 @@ export class ExpenseItemSelectionImpl implements ExpenseItemSelection
     {
         this.index = -1
         this.data = (new ExpenseItemImpl)
+    }
+}
+
+export interface UserLink
+{
+    uid:string // may be unknown up until a User says "it's me"
+    name:string
+}
+
+export interface Account
+{
+    name:string
+    users:UserLink[]
+}
+
+export class AccountImpl implements Account
+{
+    name:string
+    users:UserLink[]// Stores User UIDs
+
+    constructor()
+    {
+        this.name = ""
+        this.users = new Array<UserLink>()
     }
 }

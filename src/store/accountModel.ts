@@ -2,7 +2,7 @@ export interface DBItem
 {
     timestamp:any
 }
-
+ 
 export interface Category extends DBItem
 {
     color:string
@@ -11,9 +11,16 @@ export interface Category extends DBItem
 
 export class CategoryImpl implements Category
 {
-    color = ""
-    title = ""
-    timestamp:any = null
+    color:string
+    title:string
+    timestamp:any
+
+    constructor()
+    {
+        this.color = ""
+        this.title = ""
+        this.timestamp = null
+    }
 }
 
 export interface UserLink
@@ -30,9 +37,16 @@ export interface Account extends DBItem
 
 export class AccountImpl implements Account
 {
-    name = ""
-    users:UserLink[] = [] // Stores User UIDs
-    timestamp: any = null
+    name:string
+    users:UserLink[]// Stores User UIDs
+    timestamp:any
+
+    constructor()
+    {
+        this.name = ""
+        this.users = new Array<UserLink>()
+        this.timestamp = null
+    }
 }
 
 export enum OwnershipMode {
@@ -53,6 +67,12 @@ export interface User extends DBItem
 
 export class UserImpl implements User
 {
-    accounts = []
-    timestamp: any = null
+    accounts:AccountLink[]
+    timestamp:any
+
+    constructor()
+    {
+        this.accounts = new Array<AccountLink>()
+        this.timestamp = null
+    }
 }
