@@ -1,54 +1,13 @@
 <template>
     <v-layout class="rounded rounded-md">
-        <v-app-bar color="secondary-darken-1">
-            <v-app-bar-nav-icon @click="drawerOpening = !drawerOpening"></v-app-bar-nav-icon>
-            <v-toolbar-title>{{ accountName }}</v-toolbar-title>
-            <template v-slot:extension>
-                <v-tabs
-                v-model="tab"
-                align-tabs="title"
-                >
-                    <v-tab
-                        v-for="(item, index) in tabs"
-                        :key="index"
-                        :value="index"
-                    >
-                        {{ item }}
-                    </v-tab>
-                </v-tabs>
-            </template>
-            <div class="d-flex">
-                <v-icon :icon="'mdi-account-circle'" class="ma-4 mr-0"></v-icon>
-                <p class="ma-4">{{ currentUser }}</p>
-            </div>
-        </v-app-bar>
-        <v-navigation-drawer
-            v-model="drawerOpening"
-            width="300"
-            temporary
-        >
-            <div class="d-flex flex-row justify-space-between">
-                <v-list-item
-                    prepend-icon="mdi-account-circle"
-                    :title="currentUser"
-                ></v-list-item>
-                <v-btn density="comfortable" icon="mdi-plus" @click="addAccountFlag = true"></v-btn>
-            </div>
-
-            <v-divider></v-divider>
-
-            <v-list density="compact" nav>
-                <v-list-item v-for="(item, i) in accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item" @click="action(item, i)">
-                </v-list-item>
-            </v-list>
-            <template v-slot:append>
-                <div class="pa-2">
-                <v-btn prepend-icon="mdi-logout">
-                    Logout
-                </v-btn>
-                </div>
-            </template>
-        </v-navigation-drawer>
+        <UIAppBar v-model:sidePanelOpenFlag="drawerOpening" v-model:selectedTab="tab" :title="accountName" :username="currentUser" :tabs="tabs"></UIAppBar>
+        <UINavigationDrawer 
+            v-model:side-panel-open-flag="drawerOpening" 
+            v-model:add-account-flag="addAccountFlag" 
+            v-model:join-account="joinAccount"
+            :username="currentUser"
+            :accounts="accounts"
+        ></UINavigationDrawer>
         <v-main>
             <v-window v-model="tab">
                 <v-window-item value=0>
@@ -74,34 +33,40 @@
 import AccountDetails from '@/components/AccountDetails.vue';
 import AccountSummary from '@/components/AccountSummary.vue';
 import AddAccountDialog from '@/components/AddAccountDialog.vue';
+import UIAppBar from '@/widgets/UIAppBar.vue';
+import UINavigationDrawer from '@/widgets/UINavigationDrawer.vue';
 import { ref, watch } from 'vue';
-import { Category, Account } from '@/model/componentModel'
+import { Category, Account, AccountImpl } from '@/model/componentModel'
 
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
 const drawerOpening = ref(false)
-
+const joinAccount=ref(false)
 const tab = ref("Expenses")
 
 const tabs = ref([
     "Detailed", "Summary", "Account Setup", "Exports"
 ])
 
-const accounts = ref([
-    "AB_SB_MainAccount",
-    "MyBudget",
-    "VacAvecLesPotos"
-])
+
+const accounts = ref<Account[]>([])
+
+let tmp:Account = new AccountImpl as Account
+
+tmp.name = "AB_SB_MainAccount"
+accounts.value.push(structuredClone(tmp))
+
+tmp.name = "MyBudget"
+accounts.value.push(structuredClone(tmp))
+
+tmp.name = "VacAvecLesPotos"
+accounts.value.push(structuredClone(tmp))
+
 
 const addAccountFlag = ref(false)
 
 const account = ref<Account>()
 const categories = ref<Category[]>()
-
-function action(item:string, index:number)
-{
-    console.log("action clicked for " + item)
-}
 
 watch(account, () => {
     if(account.value)
@@ -109,5 +74,6 @@ watch(account, () => {
         console.log("Assigned to " + account.value.name)
     }
 })
+
 
 </script>

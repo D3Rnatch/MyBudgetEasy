@@ -41,6 +41,15 @@
     }
 
     function goToAppPage() {
-        router.replace('account/dashboard') // Will load the default Account
+        const hasAccount = false
+        if(hasAccount)
+        {
+            router.replace('dashboard')
+        }
+        else
+        {
+            router.replace('account')
+        }
+        //router.replace('account/dashboard') // Will load the default Account
     }
 </script>
