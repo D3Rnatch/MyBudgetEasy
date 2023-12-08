@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
-import { Account, AccountImpl, User, UserImpl, Category } from './accountModel'
+import { Account, AccountImpl, User, UserImpl, Category } from '@/model/componentModel'
+import { ref } from 'vue'
 
 export const GLOBAL_NAME="global"
 
@@ -12,7 +13,7 @@ export interface State {
 export interface AccountData {
     tmpAccount: Account
     tmpCategories: Category[]
-    currentUser: User
+    currentUser: any
     currentAccount: Account
     currentCategories: Category[]
 }
@@ -33,7 +34,7 @@ export const useAccountDataStore = defineStore('accountData', {
         return {
             tmpAccount: new AccountImpl,
             tmpCategories: [],
-            currentUser: new UserImpl,
+            currentUser: ref<User>(new UserImpl),
             currentAccount: null,
             currentCategories: null,
         }

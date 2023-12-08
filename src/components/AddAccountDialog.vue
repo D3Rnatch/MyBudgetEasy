@@ -71,7 +71,7 @@ import { Account, AccountImpl, Category, CategoryImpl } from '@/model/componentM
 // Component interface definition
 
 const props = defineProps<{ openFlag:boolean, account:Account, categories:Category[] }>()
-const emit = defineEmits(['update:openFlag', 'update:account', 'update:categories'])
+const emit = defineEmits(['update:openFlag', 'update:account', 'update:categories', 'success'])
 
 
 //*************************************** */
@@ -156,7 +156,7 @@ function updateUsersLocalRef(valueList){
 function saveAccount(){
     let tmp:Account = (new AccountImpl as Account)
     tmp.name = accountName.value
-    for(let item in users.value)
+    for(let item of users.value)
     {
         tmp.users.push({ name:item, uid:"" })
     } 
@@ -164,7 +164,7 @@ function saveAccount(){
     account.value = tmp
 
     let tmpCat:Category[] = new Array<CategoryImpl>()
-    for(let item in categories)
+    for(let item of categories.value)
     {
         let cat = new CategoryImpl()
         cat.title = item
@@ -174,6 +174,8 @@ function saveAccount(){
     categoryList.value = tmpCat
 
     openFlag.value = false
+
+    emit('success')
 }
 
 </script>

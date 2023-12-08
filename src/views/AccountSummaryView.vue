@@ -25,7 +25,7 @@
             </v-window>
         </v-main>
     </v-layout>
-    <AddAccountDialog v-model:openFlag="addAccountFlag" v-model:account="account" v-model:categories="categories"></AddAccountDialog>
+    <AddAccountDialog v-model:openFlag="addAccountFlag" v-model:account="account" v-model:categories="categories" @success="onAccountAdditionValidation"></AddAccountDialog>
 </template>
 
 <script setup lang="ts">
@@ -37,6 +37,8 @@ import UIAppBar from '@/widgets/UIAppBar.vue';
 import UINavigationDrawer from '@/widgets/UINavigationDrawer.vue';
 import { ref, watch } from 'vue';
 import { Category, Account, AccountImpl } from '@/model/componentModel'
+
+import { dbManagerInterface } from '@/controller/dbManagerInterface';
 
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
@@ -74,6 +76,12 @@ watch(account, () => {
         console.log("Assigned to " + account.value.name)
     }
 })
+
+function onAccountAdditionValidation()
+{
+    console.log("Adding this account to db")
+    dbManagerInterface.getInstance().addAccount(account.value, categories.value)
+}
 
 
 </script>

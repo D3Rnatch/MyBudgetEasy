@@ -20,6 +20,7 @@
     import { useRouter } from 'vue-router'
     import { useFirebaseAuth } from 'vuefire';
     import { useGlobalStore } from '@/store/globalStore'
+    import { dbManagerInterface } from '@/controller/dbManagerInterface';
 
     const router = useRouter()
     const store = useGlobalStore()
@@ -37,14 +38,18 @@
     function prepareAndGoToAppPage(){
         store.authenticated = true
         store.auth_userid = auth.currentUser.uid
+
+        const dbManager = dbManagerInterface.getInstance()
+        dbManager.synchronizeUserData(auth.currentUser.uid)
+
         goToAppPage()
     }
 
     function goToAppPage() {
-        const hasAccount = false
+        const hasAccount = true
         if(hasAccount)
         {
-            router.replace('dashboard')
+            router.replace('account/dashboard')
         }
         else
         {

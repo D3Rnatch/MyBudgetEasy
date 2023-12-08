@@ -1,7 +1,7 @@
 import { useCollection, useFirestore } from 'vuefire'
 import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
 import { converter, tsConverter } from '@/dao/DAOUtils'
-import { User } from '@/store/accountModel'
+import { User } from '@/model/componentModel'
 
 /**
  * User:

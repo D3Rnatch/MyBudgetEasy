@@ -32,7 +32,7 @@
 import { ref, defineEmits, computed } from 'vue'
 import UIListSetup from '@/widgets/UIListSetup.vue'; // @ is an alias to /src
 import { useAccountDataStore, useGlobalStore } from '@/store/globalStore'
-import { AccountImpl, CategoryImpl } from '@/store/accountModel'
+import { AccountImpl, CategoryImpl } from '@/model/componentModel'
 const categoryName = ref("")
 const marker = ref(true)
 const categories = ref([])

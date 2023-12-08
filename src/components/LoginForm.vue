@@ -50,6 +50,7 @@
     import { ref, defineEmits, reactive } from 'vue'
     import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
     import { useCurrentUser, useFirebaseAuth } from 'vuefire';
+    import { dbManagerInterface } from '@/controller/dbManagerInterface'
 
     const userName = ref(null)
     const password = ref(null)
@@ -84,6 +85,8 @@
                 const user = userCredential.user;
                 userName.value = ""
                 password.value = ""
+
+                dbManagerInterface.getInstance().addUser(userCredential.user.uid)
             })
             .catch((error) => {
                 const errorCode = error.code;

@@ -1,8 +1,8 @@
 import { useCollection, useFirestore } from 'vuefire'
 import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
-import { converter, tsConverter } from '@/dao/DAOUtils'
+import { converter, tsConverter, DBItem, DBItemImpl } from '@/dao/DAOUtils'
 
-import { Account, Category } from '@/store/accountModel'
+import { Account, Category } from '@/model/componentModel'
 
 
 enum PathTypes {
@@ -41,7 +41,7 @@ export class AccountDAO
     public getAccount(accountKey: string)
     {
         return doc(this.db_, this.buildPaths(PathTypes.Account, ""), accountKey)
-                        .withConverter<Account, DocumentData>(converter<Account>())
+                        .withConverter<DBItem<Account>, DocumentData>(converter<DBItem<Account>>())
     }
 
     /**
@@ -52,10 +52,11 @@ export class AccountDAO
     */
     public addAccount(accountCls:Account):string
     {
-        const account = tsConverter<Account>().from(accountCls)
-        account.timestamp = serverTimestamp()
-        const localDocRef = doc(collection(this.db_, this.buildPaths(PathTypes.Account, "")).withConverter<Account, DocumentData>(converter<Account>()))
-        setDoc(localDocRef, account)
+        const data = tsConverter<Account>().from(accountCls)        
+
+        const localDocRef = doc(collection(this.db_, this.buildPaths(PathTypes.Account, ""))
+                                .withConverter<Account, DocumentData>(converter<Account>()))
+        setDoc(localDocRef, data)
         return localDocRef.id
     }
 
@@ -68,7 +69,7 @@ export class AccountDAO
     {
         for(let i=0; i< categories.length; ++i)
         {
-            const cat = categories[i]
+            const cat = tsConverter<Category>().from(categories[i])
             cat.timestamp = serverTimestamp()
             addDoc(collection(this.db_, this.buildPaths(PathTypes.Categories, accountId))
                                 .withConverter<Category, DocumentData>(converter<Category>()), cat)
@@ -82,6 +83,7 @@ export class AccountDAO
      */
     public getCategories(accountKey: string)
     {
+        // TODO: use DBItem template class
         return collection(this.db_, this.buildPaths(PathTypes.Categories, accountKey))
                                 .withConverter<Category[], DocumentData>(converter<Category[]>())
     }
@@ -92,7 +94,7 @@ export class AccountDAO
      * @param title Find by title
      */
     public async removeCategory(id:string, title:string)
-    {        
+    {
         const col = collection(this.db_, this.buildPaths(PathTypes.Categories, id))
 
         const q = query(col, where("title", "==", title));

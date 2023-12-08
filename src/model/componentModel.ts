@@ -1,10 +1,15 @@
 
-export interface Category {
+export interface DBItem {
+    timestamp: any
+}
+
+export interface Category extends DBItem {
     uid: string // Left empty up until registered to db
     title: string
     color: string
     max:number
     amount:number
+    timestamp:any
 }
 
 export class CategoryImpl implements Category {
@@ -13,6 +18,7 @@ export class CategoryImpl implements Category {
     color: string
     max:number
     amount:number
+    timestamp:any
 
     constructor()
     {
@@ -21,6 +27,7 @@ export class CategoryImpl implements Category {
         this.color = ""
         this.max = 0
         this.amount = 0
+        this.timestamp = null
     }
 }
 
@@ -29,13 +36,14 @@ export interface ExpenseSubItem {
     category:string // Maps to UID of Category (not its title)
 }
 
-export interface ExpenseItem {
+export interface ExpenseItem extends DBItem {
     date:string
     totalAmount:number
     amounts: ExpenseSubItem[]
     description:string
     id:number
     user:string
+    timestamp:any
 }
 
 export class ExpenseItemImpl implements ExpenseItem 
@@ -46,6 +54,7 @@ export class ExpenseItemImpl implements ExpenseItem
     description: string
     id: number
     user: string
+    timestamp:any
 
     constructor()
     {
@@ -55,6 +64,7 @@ export class ExpenseItemImpl implements ExpenseItem
         this.date = ""
         this.user = ""
         this.id = -1
+        this.timestamp = null
     }
 }
 
@@ -83,20 +93,51 @@ export interface UserLink
     name:string
 }
 
-export interface Account
+export interface Account extends DBItem
 {
     name:string
     users:UserLink[]
+    timestamp:any
 }
 
 export class AccountImpl implements Account
 {
     name:string
     users:UserLink[]// Stores User UIDs
+    timestamp:any
 
     constructor()
     {
         this.name = ""
         this.users = new Array<UserLink>()
+        this.timestamp = null
+    }
+}
+
+export enum OwnershipMode {
+    Owner,
+    Maintainer
+}
+
+export interface AccountLink {
+    key:string // uid
+    mode:OwnershipMode // ownership which enables some features such as "remove account"
+}
+
+export interface User extends DBItem
+{
+    accounts:AccountLink[]
+    timestamp:any
+}
+
+export class UserImpl implements User
+{
+    accounts:AccountLink[]
+    timestamp:any
+
+    constructor()
+    {
+        this.accounts = new Array<AccountLink>()
+        this.timestamp = null
     }
 }
