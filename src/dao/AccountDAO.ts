@@ -1,6 +1,6 @@
 import { useCollection, useFirestore } from 'vuefire'
 import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
-import { converter, tsConverter, DBItem, DBItemImpl } from '@/dao/DAOUtils'
+import { converter, tsConverter } from '@/dao/DAOUtils'
 
 import { Account, Category } from '@/model/componentModel'
 
@@ -41,7 +41,7 @@ export class AccountDAO
     public getAccount(accountKey: string)
     {
         return doc(this.db_, this.buildPaths(PathTypes.Account, ""), accountKey)
-                        .withConverter<DBItem<Account>, DocumentData>(converter<DBItem<Account>>())
+                        .withConverter<Account, DocumentData>(converter<Account>())
     }
 
     /**

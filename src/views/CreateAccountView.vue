@@ -12,7 +12,7 @@
   import { useAccountDataStore, useGlobalStore } from '@/store/globalStore'
   import { AccountDAO } from '@/dao/AccountDAO';
   import { UserDAO } from '@/dao/UserDAO';
-  import { OwnershipMode } from '@/store/accountModel'
+  import { OwnershipMode } from '@/model/componentModel'
   
   const gstore = useGlobalStore()
   const store = useAccountDataStore()
