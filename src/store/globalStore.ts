@@ -16,6 +16,10 @@ export interface AccountData {
     currentUser: any
     currentAccount: Account
     currentCategories: Category[]
+    accountsList: any
+    loadingUserData:boolean
+    loadingAccountData:boolean
+    loadingCategories:boolean
 }
 
 export const useGlobalStore = defineStore('global', {
@@ -37,6 +41,10 @@ export const useAccountDataStore = defineStore('accountData', {
             currentUser: ref<User>(new UserImpl),
             currentAccount: null,
             currentCategories: null,
+            accountsList: ref<Account[]>(new Array<Account>()),
+            loadingUserData:false,
+            loadingAccountData:false,
+            loadingCategories:false
         }
     }
 })

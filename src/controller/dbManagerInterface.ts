@@ -1,5 +1,5 @@
 // Model imports
-import { Account, UserImpl, User, Category, OwnershipMode } from '@/model/componentModel'
+import { Account, UserImpl, User, Category, OwnershipMode, AccountImpl } from '@/model/componentModel'
 
 // store imports
 import { useAccountDataStore, useGlobalStore } from '@/store/globalStore'
@@ -9,11 +9,14 @@ import { UserDAO } from '@/dao/UserDAO'
 import { AccountDAO } from '@/dao/AccountDAO'
 import { useDocument } from 'vuefire'
 
+import { watch } from 'vue'
+import { DocumentSnapshot } from 'firebase/firestore'
+
 export abstract class dbManagerInterface
 {
     public abstract addAccount(account:Account, categories:Category[]) : boolean;
 
-    public abstract addUser(userUID:string) : boolean;
+    public abstract addUser(userUID:string) : string;
 
     public abstract synchronizeUserData(userUID:string);
 
@@ -27,7 +30,7 @@ export abstract class dbManagerInterface
 }
 
 /** Private section - not meant to be accessible from the outside */
-
+// TODO: Add a state Machine inside of this file => Will definitely allow to ensure all inputs are gathered in the correct order.
 class dbManagerInterfaceImpl implements dbManagerInterface
 { 
     private userDAO_: UserDAO
@@ -61,19 +64,26 @@ class dbManagerInterfaceImpl implements dbManagerInterface
         return true
     }
 
-    addUser(userUID:string) : boolean 
+    addUser(userUID:string) : string
     {
         const usr = new UserImpl as User;
-        this.userDAO_.addUser(userUID, usr);    
-        return true
+        return this.userDAO_.addUser(userUID, usr);    
     }
 
     synchronizeUserData(userUID:string)
     {
         const store = useAccountDataStore()
 
-        // Load User Data.
-        store.currentUser = useDocument(this.userDAO_.getUser(userUID))
+        // Load the content of the User Folder:
+        store.currentUser.loadingUserData = true;
+        this.userDAO_.getUser(userUID).then((data:any) => {
+            store.currentUser.value = (data.data() as User)
+            store.currentUser.loadingUserData = false
+            console.log(" Read user : " + JSON.stringify(store.currentUser.value) + " with accounts " + store.currentUser.value.accounts.length)
+        }).catch((error:any) => {
+            store.currentUser.loadingUserData = false
+        })
     }
+
 }
 

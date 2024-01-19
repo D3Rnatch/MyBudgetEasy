@@ -21,15 +21,15 @@ export class UserDAO
 
     public getUser(userUID: string)
     {
-        return doc(this.db_, this.userCollectionName_, userUID)
-                        .withConverter<User, DocumentData>(converter<User>())
+        return getDoc(doc(this.db_, this.userCollectionName_+"/"+userUID)
+                        .withConverter<User, DocumentData>(converter<User>()))
     }
 
     public addUser(userUID:string, userCls:User):string
     {
         const user = tsConverter<User>().from(userCls)
         user.timestamp = serverTimestamp()
-        const localDocRef = doc(collection(this.db_, this.userCollectionName_+"/"+userUID+"/" + this.accountRefName_).withConverter<User, DocumentData>(converter<User>()))
+        const localDocRef = doc(this.db_, this.userCollectionName_, userUID).withConverter<User, DocumentData>(converter<User>())
         setDoc(localDocRef, user)
         return localDocRef.id
     }
