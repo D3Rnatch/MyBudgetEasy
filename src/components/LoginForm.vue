@@ -83,10 +83,10 @@
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
+                dbManagerInterface.getInstance().addUser(userCredential.user.uid, userName.value)
+                
                 userName.value = ""
                 password.value = ""
-
-                dbManagerInterface.getInstance().addUser(userCredential.user.uid)
             })
             .catch((error) => {
                 const errorCode = error.code;

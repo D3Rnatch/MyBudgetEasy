@@ -21,8 +21,8 @@ export class UserDAO
 
     public getUser(userUID: string)
     {
-        return getDoc(doc(this.db_, this.userCollectionName_+"/"+userUID)
-                        .withConverter<User, DocumentData>(converter<User>()))
+        return doc(this.db_, this.userCollectionName_+"/"+userUID)
+                        .withConverter<User, DocumentData>(converter<User>())
     }
 
     public addUser(userUID:string, userCls:User):string

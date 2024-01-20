@@ -16,7 +16,7 @@ export interface AccountData {
     currentUser: any
     currentAccount: Account
     currentCategories: Category[]
-    accountsList: any
+    accountsList: Account[]
     loadingUserData:boolean
     loadingAccountData:boolean
     loadingCategories:boolean
@@ -41,7 +41,7 @@ export const useAccountDataStore = defineStore('accountData', {
             currentUser: ref<User>(new UserImpl),
             currentAccount: null,
             currentCategories: null,
-            accountsList: ref<Account[]>(new Array<Account>()),
+            accountsList: new Array<Account>(),
             loadingUserData:false,
             loadingAccountData:false,
             loadingCategories:false

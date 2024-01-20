@@ -127,17 +127,20 @@ export interface AccountLink {
 export interface User extends DBItem
 {
     accounts:AccountLink[]
+    name:string
     timestamp:any
 }
 
 export class UserImpl implements User
 {
     accounts:AccountLink[]
+    name:string
     timestamp:any
 
     constructor()
     {
         this.accounts = new Array<AccountLink>()
+        this.name = ""
         this.timestamp = null
     }
 }

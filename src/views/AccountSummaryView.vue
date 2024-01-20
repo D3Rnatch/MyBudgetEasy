@@ -6,7 +6,7 @@
             v-model:add-account-flag="addAccountFlag" 
             v-model:join-account="joinAccount"
             :username="currentUser"
-            :accounts="accounts"
+            :accounts="accountsList"
         ></UINavigationDrawer>
         <v-main>
             <v-window v-model="tab">
@@ -35,10 +35,13 @@ import AccountSummary from '@/components/AccountSummary.vue';
 import AddAccountDialog from '@/components/AddAccountDialog.vue';
 import UIAppBar from '@/widgets/UIAppBar.vue';
 import UINavigationDrawer from '@/widgets/UINavigationDrawer.vue';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Category, Account, AccountImpl } from '@/model/componentModel'
-
+import { useAccountDataStore } from '@/store/globalStore'
 import { dbManagerInterface } from '@/controller/dbManagerInterface';
+
+const store = useAccountDataStore()
+const accountsList = computed(() => { return store.accountsList })
 
 const accountName = ref("AccountName")
 const currentUser = ref("UserName")
@@ -49,21 +52,6 @@ const tab = ref("Expenses")
 const tabs = ref([
     "Detailed", "Summary", "Account Setup", "Exports"
 ])
-
-
-const accounts = ref<Account[]>([])
-
-let tmp:Account = new AccountImpl as Account
-
-tmp.name = "AB_SB_MainAccount"
-accounts.value.push(structuredClone(tmp))
-
-tmp.name = "MyBudget"
-accounts.value.push(structuredClone(tmp))
-
-tmp.name = "VacAvecLesPotos"
-accounts.value.push(structuredClone(tmp))
-
 
 const addAccountFlag = ref(false)
 

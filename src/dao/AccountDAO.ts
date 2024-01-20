@@ -1,5 +1,5 @@
 import { useCollection, useFirestore } from 'vuefire'
-import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
+import { collection, doc, setDoc, getDocs, Firestore, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData, documentId } from 'firebase/firestore'
 import { converter, tsConverter } from '@/dao/DAOUtils'
 
 import { Account, Category } from '@/model/componentModel'
@@ -37,11 +37,23 @@ export class AccountDAO
      * Fetches the account by searching for the matching Document ID
      * @param accountKey Document ID value in accounts
      * @returns the corresponding doc reference if any found.
+     * NOT WORKING.
      */
     public getAccount(accountKey: string)
     {
-        return doc(this.db_, this.buildPaths(PathTypes.Account, ""), accountKey)
+        return doc(this.db_, this.buildPaths(PathTypes.Account, "") + "/" + accountKey)
                         .withConverter<Account, DocumentData>(converter<Account>())
+    }
+
+    /**
+     * Fetches the accounts by searching for the matching Document ID provided as input argument.
+     * This method limits the fetch to 10 elements due to the use of "in" parameter in query.
+     * @param accountList Document ID value in accounts as string array.
+     * @returns the created query reference object.
+     */
+    public getAccounts(accountList:string[])
+    {
+        return query(collection(this.db_, this.buildPaths(PathTypes.Account, "")).withConverter<Account, DocumentData>(converter<Account>()), where('__name__', 'in', accountList))
     }
 
     /**
@@ -83,7 +95,6 @@ export class AccountDAO
      */
     public getCategories(accountKey: string)
     {
-        // TODO: use DBItem template class
         return collection(this.db_, this.buildPaths(PathTypes.Categories, accountKey))
                                 .withConverter<Category[], DocumentData>(converter<Category[]>())
     }

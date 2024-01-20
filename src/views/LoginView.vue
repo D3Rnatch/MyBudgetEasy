@@ -20,7 +20,7 @@
     import { useRouter } from 'vue-router'
     import { useFirebaseAuth } from 'vuefire';
     import { useGlobalStore } from '@/store/globalStore'
-    import { dbManagerInterface } from '@/controller/dbManagerInterface';
+    import { useDataSyncManager } from '@/store/DataSyncManager';
 
     const router = useRouter()
     const store = useGlobalStore()
@@ -39,8 +39,8 @@
         store.authenticated = true
         store.auth_userid = auth.currentUser.uid
 
-        const dbManager = dbManagerInterface.getInstance()
-        dbManager.synchronizeUserData(auth.currentUser.uid)
+        const dataSync = useDataSyncManager
+        dataSync.syncData()
 
         goToAppPage()
     }

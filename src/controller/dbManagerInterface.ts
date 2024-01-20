@@ -16,7 +16,7 @@ export abstract class dbManagerInterface
 {
     public abstract addAccount(account:Account, categories:Category[]) : boolean;
 
-    public abstract addUser(userUID:string) : string;
+    public abstract addUser(userUID:string, userName:string) : string;
 
     public abstract synchronizeUserData(userUID:string);
 
@@ -64,25 +64,17 @@ class dbManagerInterfaceImpl implements dbManagerInterface
         return true
     }
 
-    addUser(userUID:string) : string
+    addUser(userUID:string, userName:string) : string
     {
         const usr = new UserImpl as User;
+        usr.name = userName;
+
         return this.userDAO_.addUser(userUID, usr);    
     }
 
     synchronizeUserData(userUID:string)
     {
-        const store = useAccountDataStore()
-
-        // Load the content of the User Folder:
-        store.currentUser.loadingUserData = true;
-        this.userDAO_.getUser(userUID).then((data:any) => {
-            store.currentUser.value = (data.data() as User)
-            store.currentUser.loadingUserData = false
-            console.log(" Read user : " + JSON.stringify(store.currentUser.value) + " with accounts " + store.currentUser.value.accounts.length)
-        }).catch((error:any) => {
-            store.currentUser.loadingUserData = false
-        })
+        console.log(" Loading " + userUID)
     }
 
 }
