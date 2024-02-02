@@ -20,7 +20,6 @@
     import { useRouter } from 'vue-router'
     import { useFirebaseAuth } from 'vuefire';
     import { useGlobalStore } from '@/store/globalStore'
-    import { useDataSyncManager } from '@/store/DataSyncManager';
 
     const router = useRouter()
     const store = useGlobalStore()
@@ -33,14 +32,13 @@
         // store.auth_userid = ""
         // Check User still exists on database.
         // goToAppPage();
+
+        console.log("Past logged in " + store.auth_userid)
     }
 
     function prepareAndGoToAppPage(){
         store.authenticated = true
         store.auth_userid = auth.currentUser.uid
-
-        const dataSync = useDataSyncManager
-        dataSync.syncData()
 
         goToAppPage()
     }

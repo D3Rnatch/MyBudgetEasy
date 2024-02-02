@@ -1,5 +1,10 @@
 <template>
-    <v-layout class="rounded rounded-md">
+    <v-layout class="rounded rounded-md" v-if="dataLoadPending">
+        <v-main>
+            <v-progress-circular color="primary" indeterminate ></v-progress-circular>
+        </v-main>
+    </v-layout>
+    <v-layout class="rounded rounded-md" v-if="!dataLoadPending">
         <UIAppBar v-model:sidePanelOpenFlag="drawerOpening" v-model:selectedTab="tab" :title="accountName" :username="currentUser" :tabs="tabs"></UIAppBar>
         <UINavigationDrawer 
             v-model:side-panel-open-flag="drawerOpening" 
@@ -30,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-
+import { onBeforeMount } from 'vue'
 import AccountDetails from '@/components/AccountDetails.vue';
 import AccountSummary from '@/components/AccountSummary.vue';
 import AddAccountDialog from '@/components/AddAccountDialog.vue';
@@ -40,11 +45,13 @@ import { computed, ref, watch } from 'vue';
 import { Category, Account, AccountImpl, DBObject } from '@/model/componentModel'
 import { useAccountDataStore } from '@/store/globalStore'
 import { dbManagerInterface } from '@/controller/dbManagerInterface';
+import { useDataSyncManager } from '@/store/DataSyncManager';
 
+const dataSyncManager = useDataSyncManager
 const store = useAccountDataStore()
 const accountsList = computed(() => { return store.accountsList });
-
 const accountName = computed(() => { return store.currentAccount.data.name });
+const dataLoadPending = ref(true) // Init of component is about loading data
 const currentUser = ref("UserName")
 const drawerOpening = ref(false)
 const joinAccount=ref(false)
@@ -77,5 +84,16 @@ function onAccountSelectionChange(item:DBObject<Account>, index:number)
     console.log("onAccountSelectionChange " + JSON.stringify(item) + " at " + index)
     store.currentAccount = item
 }
+
+onBeforeMount(() => {
+  console.log(`the component is now mounted.`)
+
+  // Start loading stuff:
+  dataSyncManager.syncData(() => {
+    dataLoadPending.value = false
+  })
+})
+
+
 
 </script>

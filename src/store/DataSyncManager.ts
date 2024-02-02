@@ -23,7 +23,7 @@ export class DataSyncManager
         this.dataStore_ = null
     }
 
-    public syncData()
+    public syncData(callback : () => void)
     {
         this.checkAndInitialize()
 
@@ -53,9 +53,9 @@ export class DataSyncManager
                     {
                         this.dataStore_.currentAccount = this.dataStore_.accountsList[0]
                     }
+                    callback()
             })
-        } )
-
+        })
     }
 
     public stopSync()

@@ -29,7 +29,7 @@ export const useGlobalStore = defineStore('global', {
             authenticated: false,
         }
     },
-    persist: false
+    persist: true
 })
 
 
