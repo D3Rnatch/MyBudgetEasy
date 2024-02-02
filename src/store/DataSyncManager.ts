@@ -3,7 +3,7 @@ import { UserDAO } from "@/dao/UserDAO";
 import { onSnapshot, getDoc } from "firebase/firestore";
 import { useGlobalStore, useAccountDataStore } from '@/store/globalStore'
 import { AccountDAO } from "@/dao/AccountDAO";
-import { Account } from "@/model/componentModel";
+import { Account, DBObject } from "@/model/componentModel";
 
 export class DataSyncManager
 {
@@ -41,15 +41,21 @@ export class DataSyncManager
                         const index = this.dataStore_.accountsList.findIndex((el) => el.name === content.data().name) 
                         if(index !== -1)
                         {
-                            this.dataStore_.accountsList[index] = content.data() as Account
+                            this.dataStore_.accountsList[index] = new DBObject<Account>(content.data() as Account, content.id)
                         }
                         else
                         {
-                            this.dataStore_.accountsList.push( content.data() as Account )
+                            this.dataStore_.accountsList.push( new DBObject<Account>(content.data() as Account, content.id) )
                         }
                     })
+
+                    if(this.dataStore_.length !== 0)
+                    {
+                        this.dataStore_.currentAccount = this.dataStore_.accountsList[0]
+                    }
             })
         } )
+
     }
 
     public stopSync()

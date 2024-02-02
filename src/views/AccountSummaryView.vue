@@ -7,6 +7,7 @@
             v-model:join-account="joinAccount"
             :username="currentUser"
             :accounts="accountsList"
+            @selected-account-changed="onAccountSelectionChange"
         ></UINavigationDrawer>
         <v-main>
             <v-window v-model="tab">
@@ -36,14 +37,14 @@ import AddAccountDialog from '@/components/AddAccountDialog.vue';
 import UIAppBar from '@/widgets/UIAppBar.vue';
 import UINavigationDrawer from '@/widgets/UINavigationDrawer.vue';
 import { computed, ref, watch } from 'vue';
-import { Category, Account, AccountImpl } from '@/model/componentModel'
+import { Category, Account, AccountImpl, DBObject } from '@/model/componentModel'
 import { useAccountDataStore } from '@/store/globalStore'
 import { dbManagerInterface } from '@/controller/dbManagerInterface';
 
 const store = useAccountDataStore()
-const accountsList = computed(() => { return store.accountsList })
+const accountsList = computed(() => { return store.accountsList });
 
-const accountName = ref("AccountName")
+const accountName = computed(() => { return store.currentAccount.data.name });
 const currentUser = ref("UserName")
 const drawerOpening = ref(false)
 const joinAccount=ref(false)
@@ -71,5 +72,10 @@ function onAccountAdditionValidation()
     dbManagerInterface.getInstance().addAccount(account.value, categories.value)
 }
 
+function onAccountSelectionChange(item:DBObject<Account>, index:number)
+{
+    console.log("onAccountSelectionChange " + JSON.stringify(item) + " at " + index)
+    store.currentAccount = item
+}
 
 </script>

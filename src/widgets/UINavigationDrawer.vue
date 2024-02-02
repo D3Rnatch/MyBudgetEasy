@@ -15,7 +15,7 @@
         <v-divider></v-divider>
 
         <v-list density="compact" nav>
-            <v-list-item v-for="(item, i) in props.accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item.name" @click="emits('selectedAccountChanged',item, i)">
+            <v-list-item v-for="(item, i) in props.accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item.data.name" @click="emits('selectedAccountChanged',item, i)">
             </v-list-item>
         </v-list>
         <template v-slot:append>
@@ -31,9 +31,9 @@
 <script setup lang="ts">
 
 import { defineProps, defineEmits, ref, computed } from 'vue'
-import { Account } from '@/model/componentModel'
+import { Account, DBObject } from '@/model/componentModel'
 
-const props = defineProps<{ sidePanelOpenFlag:boolean, addAccountFlag:boolean, joinAccount:boolean, username:string, accounts:Account[] }>()
+const props = defineProps<{ sidePanelOpenFlag:boolean, addAccountFlag:boolean, joinAccount:boolean, username:string, accounts:DBObject<Account>[] }>()
 
 const emits = defineEmits(['update:sidePanelOpenFlag', 'update:addAccountFlag', 'logoutClicked', 'update:joinAccount', 'selectedAccountChanged'])
 

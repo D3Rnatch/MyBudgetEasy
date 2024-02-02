@@ -144,3 +144,15 @@ export class UserImpl implements User
         this.timestamp = null
     }
 }
+
+export class DBObject<InnerType>
+{
+    public data:InnerType
+    public id:string
+
+    constructor(data:InnerType, id:string)
+    {
+        this.data = data
+        this.id = id
+    }
+}
