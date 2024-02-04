@@ -12,8 +12,9 @@
         <v-combobox
             label="Category"
             :items="props.categories"
-            class="ml-2 mr-2"
+            class="ml-2 mr-2 h-0 w-0"
             v-model="currentCategory"
+            item-title="data.title"
         />
         <v-btn density="comfortable" icon="mdi-plus" class="ma-0 mt-3" @click="add" :disabled="!conditionValid"></v-btn>
     </div>
@@ -35,11 +36,11 @@
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps, computed } from 'vue'
-import { Category, ExpenseSubItem } from '@/model/componentModel'
+import { Category, ExpenseSubItem, DBObject } from '@/model/componentModel'
 
 interface Props {
     modelValue:ExpenseSubItem[]
-    categories:Category[]
+    categories:DBObject<Category>[]
 }
 
 const props = defineProps<Props>()
@@ -55,7 +56,8 @@ const value = computed(() => {
 })
 
 const newAmount = ref<string>("")
-const currentCategory=ref<Category>(props.categories.at(0))
+const currentCategory=ref<DBObject<Category>>(props.categories.at(0))
+
 
 const conditionValid = computed(() => {
     let status = false
@@ -68,7 +70,7 @@ const conditionValid = computed(() => {
 })
 
 function add(){
-    value.value.push({amount: +(newAmount.value), category:currentCategory.value.title})
+    value.value.push({amount: +(newAmount.value), category:currentCategory.value.id})
     emit('update:modelValue', value.value)
     emit('added', Number(newAmount.value))
     newAmount.value=""

@@ -38,8 +38,8 @@
             </v-col>
         </v-row>
     </v-container>
-    <EditExpenseItemDialog v-model="addExpense" :edit="false"></EditExpenseItemDialog>
-    <EditExpenseItemDialog v-model="editExpense" :edit="true" v-model:item="selectedItem.data"></EditExpenseItemDialog>
+    <EditExpenseItemDialog v-model="addExpense" :edit="false" :categories="categories" :users="users"></EditExpenseItemDialog>
+    <EditExpenseItemDialog v-model="editExpense" :edit="true" v-model:item="selectedItem.data" :categories="categories" :users="users"></EditExpenseItemDialog>
 
 </template>
 
@@ -47,8 +47,10 @@
 import UIAccountExpenseList from '@/widgets/UIAccountExpenseList.vue';
 import EditExpenseItemDialog from '@/components/EditExpenseItemDialog.vue';
 import { ExpenseItem, ExpenseItemSelection, ExpenseItemSelectionImpl } from '@/model/componentModel'
+import { useAccountDataStore } from '@/store/globalStore'
+import { ref, watch, computed } from 'vue';
 
-import { ref, watch } from 'vue';
+const store = useAccountDataStore()
 
 const items = ref<ExpenseItem[]>([
     {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"}, {amount: 15, category:"Title2" } ], description:"BlaBlaBla", id:7, user:"Toto"},
@@ -82,12 +84,8 @@ const currentPage = ref(1)
 
 const selectedFilter = ref("Past Month")
 
-const categories = ref([
-    {title: "Title1", color:"#0c0c0c", max:253, amount: 300},
-    {title: "Title2", color:"cyan", max:278, amount: 90},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-])
+const categories = computed(() => { return store.currentCategories })
+const users = computed(() => { return store.currentAccount.data.users } )
 
 const selectedItem = ref<ExpenseItemSelection>(new ExpenseItemSelectionImpl as ExpenseItemSelection)
 

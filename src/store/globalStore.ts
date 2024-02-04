@@ -15,7 +15,7 @@ export interface AccountData {
     tmpCategories: Category[]
     currentUser: any
     currentAccount: DBObject<Account>
-    currentCategories: Category[]
+    currentCategories: DBObject<Category>[]
     accountsList: DBObject<Account>[]
     loadingUserData:boolean
     loadingAccountData:boolean
@@ -40,7 +40,7 @@ export const useAccountDataStore = defineStore('accountData', {
             tmpCategories: [],
             currentUser: ref<User>(new UserImpl),
             currentAccount: new DBObject<Account>(new AccountImpl as Account, ""),
-            currentCategories: null,
+            currentCategories: new Array<DBObject<Category>>(),
             accountsList: new Array<DBObject<Account>>(),
             loadingUserData:false,
             loadingAccountData:false,

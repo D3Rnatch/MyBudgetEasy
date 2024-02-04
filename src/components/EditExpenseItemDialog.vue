@@ -36,10 +36,11 @@ width="1024"
                             ></v-text-field>
                             <v-combobox
                                 v-model="selectedUser"
-                                :items="users"
+                                :items="props.users"
                                 density="comfortable"
                                 label="User"
                                 rounded="1"
+                                item-title="name"
                             ></v-combobox>
                             <p>
                                 Amount: {{ currentItem.totalAmount }} €
@@ -70,11 +71,11 @@ width="1024"
 <script setup lang="ts">
 import { defineProps, computed, defineEmits, ref, watch } from 'vue'
 import UIExpenseAddition from '@/widgets/UIExpenseAddition.vue';
-import { ExpenseItemImpl, Category, ExpenseSubItem, ExpenseItem } from '@/model/componentModel'
+import { ExpenseItemImpl, Category, DBObject, ExpenseItem, UserLink } from '@/model/componentModel'
 
 //*************************************** */
 // Component interface definition
-const props = defineProps<{ modelValue:boolean, edit:boolean, item?:ExpenseItem }>()
+const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], users:UserLink[], item?:ExpenseItem }>()
 const emit = defineEmits(['update:modelValue', 'update:item'])
 
 
@@ -89,20 +90,7 @@ const pwdRules = [
     },
 ]
 
-const categories = ref([
-    {title: "Title1", color:"#0c0c0c", max:253, amount: 300},
-    {title: "Title2", color:"cyan", max:278, amount: 90},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-])
-
-const users = ref([
-    {uid:"123456", title: "Norman"},
-    {uid:"123456", title: "Jacob"},
-    {uid:"123456", title: "Pierre"}
-])
-
-const selectedUser = ref(users.value.at(0))
+const selectedUser = ref(props.users.at(0))
 
 //*************************************** */
 // Computed definition
@@ -139,7 +127,7 @@ const isValid = computed(() => {
 // Component methods
 
 watch(selectedUser, () => {
-    currentItem.value.user = selectedUser.value.title
+    currentItem.value.user = selectedUser.value.name
 })
 
 watch(value, () => {
@@ -163,7 +151,7 @@ watch(value, () => {
         {
             console.log("restoring to default ON")
             currentItem.value = (new ExpenseItemImpl as ExpenseItem)
-            currentItem.value.user = users.value.at(0).title
+            currentItem.value.user = props.users.at(0).uid
             console.log("restoring to default END is amounts valid " + currentItem.value.totalAmount)
         }
     }

@@ -3,7 +3,7 @@ import { UserDAO } from "@/dao/UserDAO";
 import { onSnapshot, getDoc } from "firebase/firestore";
 import { useGlobalStore, useAccountDataStore } from '@/store/globalStore'
 import { AccountDAO } from "@/dao/AccountDAO";
-import { Account, DBObject } from "@/model/componentModel";
+import { Account, DBObject, Category } from "@/model/componentModel";
 
 export class DataSyncManager
 {
@@ -13,6 +13,7 @@ export class DataSyncManager
     private globalStore_:any
     private dataStore_:any
     private accountsSubscription_:any
+    private categoriesSubscription_:any
 
     constructor()
     {
@@ -21,6 +22,7 @@ export class DataSyncManager
         this.userSubscription_ = null
         this.globalStore_ = null
         this.dataStore_ = null
+        this.categoriesSubscription_ = null
     }
 
     public syncData(callback : () => void)
@@ -52,9 +54,29 @@ export class DataSyncManager
                     if(this.dataStore_.length !== 0)
                     {
                         this.dataStore_.currentAccount = this.dataStore_.accountsList[0]
+                        this.syncCurrentAccount(callback)
                     }
-                    callback()
+                    else
+                    {
+                        // Notify listening component that the load process is over.
+                        callback()
+                    }
             })
+        })
+    }
+
+    public syncCurrentAccount(callback : () => void)
+    {
+        // Load categories for current account:
+        this.categoriesSubscription_ = onSnapshot(this.accountDAO_.getCategories(this.dataStore_.currentAccount.id), (data) => {
+            const finalData = new Array<DBObject<Category>>()
+            data.forEach((content) => {
+                finalData.push( new DBObject<Category>( content.data() as Category, content.id ) )
+            })
+
+            this.dataStore_.currentCategories = finalData
+
+            callback()
         })
     }
 
@@ -88,10 +110,6 @@ export class DataSyncManager
         if(!this.dataStore_)
         {
             this.dataStore_ = useAccountDataStore()
-            if(!this.dataStore_.accountsList.value)
-            {
-                this.dataStore_.accountsList.value = new Map<string, Account>()
-            }
         }
     }
 }

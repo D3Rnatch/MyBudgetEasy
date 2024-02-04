@@ -96,7 +96,7 @@ export class AccountDAO
     public getCategories(accountKey: string)
     {
         return collection(this.db_, this.buildPaths(PathTypes.Categories, accountKey))
-                                .withConverter<Category[], DocumentData>(converter<Category[]>())
+                                .withConverter<Category, DocumentData>(converter<Category>())
     }
 
     /**

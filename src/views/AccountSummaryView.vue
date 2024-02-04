@@ -83,6 +83,9 @@ function onAccountSelectionChange(item:DBObject<Account>, index:number)
 {
     console.log("onAccountSelectionChange " + JSON.stringify(item) + " at " + index)
     store.currentAccount = item
+    dataSyncManager.syncCurrentAccount(() => {
+        console.log("Current Account Synched")
+    })
 }
 
 onBeforeMount(() => {
@@ -91,6 +94,8 @@ onBeforeMount(() => {
   // Start loading stuff:
   dataSyncManager.syncData(() => {
     dataLoadPending.value = false
+
+    console.log("Loaded categories " + JSON.stringify(store.currentCategories))
   })
 })
 
