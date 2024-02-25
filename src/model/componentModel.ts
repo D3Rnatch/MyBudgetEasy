@@ -85,18 +85,18 @@ export class ExpenseItemImpl implements ExpenseItem
 export interface ExpenseItemSelection
 {
     index: number
-    data: ExpenseItem
+    data: DBObject<ExpenseItem>
 }
 
 export class ExpenseItemSelectionImpl implements ExpenseItemSelection
 {
     index: number
-    data: ExpenseItem
+    data: DBObject<ExpenseItem>
 
     constructor()
     {
         this.index = -1
-        this.data = (new ExpenseItemImpl)
+        this.data = new DBObject<ExpenseItem>(new ExpenseItemImpl, "")
     }
 }
 

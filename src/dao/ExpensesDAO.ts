@@ -92,13 +92,13 @@ export class ExpensesDAO
                     })
     }
 
-    public setExpense(accountKey:string, expense:Expense)
+    public updateExpense(accountKey:string, expense:Expense)
     {
         setDoc(doc(this.db_, this.expenseCollectionName_, accountKey, expense.id).withConverter<Expense, DocumentData>(converter<Expense>()), expense)
     }
 
     public removeExpense(accountKey:string, ids:string[])
-    {
+    { 
         ids.forEach((value:string) => {
             // Remove all related docs:
             deleteDoc(doc(this.db_, this.expenseCollectionName_+"/"+accountKey+"/"+this.expenseCollectionName_+"/"+value))

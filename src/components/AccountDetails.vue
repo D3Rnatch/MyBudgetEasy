@@ -38,8 +38,24 @@
             </v-col>
         </v-row>
     </v-container>
-    <EditExpenseItemDialog v-model="addExpense" :edit="false" :categories="categories" :categoryMap="categoryMap" :users="users" v-model:item="newItem" @save-clicked="onAddEditExpenseSaveClicked"></EditExpenseItemDialog>
-    <EditExpenseItemDialog v-model="editExpense" :edit="true" v-model:item="selectedItem.data" :categories="categories" :categoryMap="categoryMap" :users="users" @save-clicked="onAddEditExpenseSaveClicked"></EditExpenseItemDialog>
+    <EditExpenseItemDialog 
+        v-model="addExpense" 
+        :edit="false" 
+        :categories="categories" 
+        :categoryMap="categoryMap" 
+        :users="users" 
+        v-model:item="newItem" 
+        @save-clicked="onAddExpenseSaveClicked"
+    />
+    <EditExpenseItemDialog 
+        v-model="editExpense" 
+        :edit="true" 
+        v-model:item="selectedItem.data" 
+        :categories="categories" 
+        :categoryMap="categoryMap" 
+        :users="users" 
+        @save-clicked="onEditExpenseSaveClicked" 
+    />
 
 </template>
 
@@ -82,7 +98,7 @@ const users = computed(() => { return store.currentAccount.data.users } )
 
 const selectedItem = ref<ExpenseItemSelection>(new ExpenseItemSelectionImpl as ExpenseItemSelection)
 
-const newItem = ref(new ExpenseItemImpl)
+const newItem = ref(new DBObject<ExpenseItem>(new ExpenseItemImpl, ""))
 
 function onDelete()
 {
@@ -90,14 +106,28 @@ function onDelete()
     const tmp:DBObject<ExpenseItem> = items.value.at(selectedItem.value.index)
     const sync = useDataSyncManager
     sync.removeExpenseFromAccount(tmp)
+    clearSelection()
 }
 
-function onAddEditExpenseSaveClicked()
+function onAddExpenseSaveClicked(item:DBObject<ExpenseItem>)
 {
-    console.log("onAddEditExpenseSaveClicked " + JSON.stringify(newItem.value))
+    console.log("onAddEditExpenseSaveClicked " + JSON.stringify(item))
     // Sync with database the last received expense:
     const sync = useDataSyncManager
-    sync.addExpenseToCurrentAccount(newItem.value)
+    sync.addExpenseToCurrentAccount(item.data)
+}
+
+function onEditExpenseSaveClicked(item:DBObject<ExpenseItem>)
+{
+    console.log("onAddEditExpenseSaveClicked " + JSON.stringify(item))
+    const sync = useDataSyncManager
+    sync.updateExpenseOnAccount(item)
+    clearSelection()
+}
+
+function clearSelection()
+{
+    selectedItem.value.index = -1
 }
 
 watch(newItem, () => {
@@ -105,7 +135,7 @@ watch(newItem, () => {
 })
 
 watch(selectedItem, () => {
-    console.log("Is SelectedItem defined " + selectedItem.value.data.description)
+    console.log("Is SelectedItem defined " + JSON.stringify(selectedItem.value))
 })
 
 </script>

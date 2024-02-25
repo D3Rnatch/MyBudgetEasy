@@ -212,6 +212,16 @@ export class DataSyncManager
         }
     }
 
+    public updateExpenseOnAccount(expense:DBObject<ExpenseItem>)
+    {
+        console.log("updateExpenseOnAccount - removed from account " + JSON.stringify(expense))
+        // Remove
+        this.removeExpenseFromAccount(expense)
+
+        // Then add
+        this.addExpenseToCurrentAccount(expense.data)
+    }
+
     public removeExpenseFromAccount(expense:DBObject<ExpenseItem>)
     {
         const arr = new Array<string>()

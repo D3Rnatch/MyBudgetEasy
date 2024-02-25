@@ -75,12 +75,14 @@ import { ExpenseItemImpl, Category, DBObject, ExpenseItem, UserLink } from '@/mo
 
 //*************************************** */
 // Component interface definition
-const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], categoryMap:Map<string, Category>, users:UserLink[], item?:ExpenseItem }>()
+const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], categoryMap:Map<string, Category>, users:UserLink[], item?:DBObject<ExpenseItem> }>()
 const emit = defineEmits(['update:modelValue', 'update:item', 'saveClicked'])
 
 
 //*************************************** */
 // Ref definition
+const refId = ref(props.item? props.item.id : "")
+
 const currentItem = ref(new ExpenseItemImpl as ExpenseItem)
 
 const pwdRules = [
@@ -141,7 +143,8 @@ watch(value, () => {
         if(value.value)
         {
             console.log("Setting up edition ON")
-            currentItem.value = structuredClone(props.item);
+            currentItem.value = structuredClone(props.item.data);
+            refId.value = (props.item? props.item.id : "")
             console.log("Setting up edition END")
         }
     }
@@ -159,7 +162,7 @@ watch(value, () => {
 
 function onSave()
 {
-    console.log("Item to save " + JSON.stringify(currentItem.value))
+    console.log("Item to save " + JSON.stringify(currentItem.value) + " refId " + refId.value)
     
     if(!props.edit)
     {
@@ -167,11 +170,9 @@ function onSave()
         currentItem.value.date = new Date().toISOString()
     }
 
-    inputItem.value = currentItem.value
+    const item = new DBObject<ExpenseItem>(currentItem.value, refId.value)
     
-    console.log("Item to save " + JSON.stringify(inputItem.value))
-
-    emit('saveClicked')
+    emit('saveClicked', item)
     value.value = false
 }
 

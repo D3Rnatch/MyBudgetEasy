@@ -4,7 +4,7 @@
         class="flex"
         max-height=500
     >
-        <v-list-group v-for="(item, i) in props.items" :key="i" :value="i" color="primary" @click="onSelected(i, item.data)">
+        <v-list-group v-for="(item, i) in props.items" :key="i" :value="i" color="primary" @click="onSelected(i, item)">
             <template v-slot:activator="{ props }">
                 <v-list-item v-bind="props">
                     <template v-slot:title>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue';
+import { defineProps, defineEmits, ref, computed } from 'vue';
 import { ExpenseItem, ExpenseSubItem, ExpenseItemSelection, Category, DBObject } from '@/model/componentModel'
 
 const props = defineProps<{ items:DBObject<ExpenseItem>[], categories:Map<string, Category>, modelValue:ExpenseItemSelection }>()
@@ -36,6 +36,17 @@ const emit = defineEmits<{
 }>()
 
 const selected = ref<ExpenseItemSelection>()
+
+const selectedItem = computed({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    console.log("Updated Selected Item !")
+    emit('update:modelValue', value)
+  }
+})
+
 
 function getCategoryName(key:string)
 {
@@ -48,7 +59,7 @@ function getCategoryName(key:string)
     return ret
 }
 
-function onSelected(index:number, data:ExpenseItem)
+function onSelected(index:number, data:DBObject<ExpenseItem>)
 {
     let replace=true
     if(selected.value)
@@ -65,9 +76,10 @@ function onSelected(index:number, data:ExpenseItem)
 
     if(replace)
     {
-        selected.value = { index:index, data:props.items.at(index).data }
-        console.log("Selected " + index)
-        emit('update:modelValue', selected.value)
+        selected.value = { index:index, data:props.items.at(index) }
+        console.log("Selected " + index + " it " + JSON.stringify(selected.value))
+        selectedItem.value = selected.value
+        //emit('update:modelValue', selected.value)
     }
 }
 
