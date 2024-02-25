@@ -24,7 +24,7 @@
                 {{ item.amount }} €
             </v-list-item-title>
             <template v-slot:subtitle>
-                {{ item.category }}
+                {{ getCategoryName(item.category) }}
             </template>
             <template v-slot:append>
                     <v-icon :icon="'mdi-delete'" @click="remove(index)"></v-icon>
@@ -37,10 +37,12 @@
 <script setup lang="ts">
 import { ref, defineEmits, defineProps, computed } from 'vue'
 import { Category, ExpenseSubItem, DBObject } from '@/model/componentModel'
+import { equalTo } from 'firebase/database';
 
 interface Props {
     modelValue:ExpenseSubItem[]
     categories:DBObject<Category>[]
+    categoryMap:Map<string, Category>
 }
 
 const props = defineProps<Props>()
@@ -68,6 +70,17 @@ const conditionValid = computed(() => {
 
     return status
 })
+
+function getCategoryName(key:string)
+{
+    let ret = "unknown"
+    if(props.categoryMap.has(key))
+    {
+        ret =  props.categoryMap.get(key).title
+    }
+
+    return ret;
+}
 
 function add(){
     value.value.push({amount: +(newAmount.value), category:currentCategory.value.id})

@@ -1,10 +1,16 @@
 import { useFirestore } from 'vuefire'
-import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, DocumentData } from 'firebase/firestore'
+import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, startAfter, addDoc, query, where, deleteDoc, DocumentData, limit } from 'firebase/firestore'
 import { converter } from '@/dao/DAOUtils'
+
+export enum ExpenseType
+{
+    PARENT = 0,
+    CHILD
+}
 
 export interface Expense
 {
-    type:number // enum of SINGLE, MULTIPLE
+    type:ExpenseType // enum of SINGLE, MULTIPLE
     category:string // Key ref of the corresponding Category
     amount:number
     id:string // auto-generated id.
@@ -12,6 +18,20 @@ export interface Expense
     owner:string // Key Ref of the User
     comment:string
     parent:string // Key ref to other expense
+    childNumber:number
+}
+
+export class ExpenseImpl implements Expense
+{
+    type = ExpenseType.PARENT // enum of SINGLE, MULTIPLE
+    category = "" // Key ref of the corresponding Category
+    amount = 0
+    id= "" // auto-generated id.
+    date=""
+    owner="" // Key Ref of the User
+    comment=""
+    parent="" // Key ref to other expense
+    childNumber = 0
 }
 
 /*
@@ -27,24 +47,49 @@ export interface Expense
 export class ExpensesDAO
 {
     private db_: Firestore
-    private expenseCollectionName_:string = "expenses"
-    private categoryCollectionName_:string = "categories"
+    private expenseCollectionName_ = "expenses"
+    private categoryCollectionName_ = "categories"
 
     constructor()
     {
         this.db_ = useFirestore()
     }
 
-    public getExpenses(accountKey:string)
+    public getExpensesPage(accountKey:string, numberOfItemsPerPage:number, lastRef?:any)
     {
-        collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)
-        .withConverter<Expense[], DocumentData>(converter<Expense[]>())
+        const collectionDta = collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)
+                                            .withConverter<Expense, DocumentData>(converter<Expense>())
+        let queryDta = null
+        if(lastRef)
+        {
+            queryDta = query(collectionDta, startAfter(lastRef), limit(numberOfItemsPerPage))
+        }
+        else
+        {
+            queryDta = query(collectionDta, limit(numberOfItemsPerPage))
+        }
+
+        return queryDta
     }
 
-    public addExpense(accountKey:string, expense:Expense)
+    public getExpenses(accountKey:string)
     {
+        return collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)
+        .withConverter<Expense, DocumentData>(converter<Expense>())
+    }
+
+    public addExpense(accountKey:string, rootExpense:Expense, childExpenses:Expense[])
+    {
+        // Add Doc
         addDoc(collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)
-        .withConverter<Expense, DocumentData>(converter<Expense>()), expense)
+                    .withConverter<Expense, DocumentData>(converter<Expense>()), rootExpense).then((docRef) => {
+                        for(const items of childExpenses)
+                        {
+                            items.parent = docRef.id
+                            addDoc(collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)
+                                    .withConverter<Expense, DocumentData>(converter<Expense>()), items)
+                        }
+                    })
     }
 
     public setExpense(accountKey:string, expense:Expense)

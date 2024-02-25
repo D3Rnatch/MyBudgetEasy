@@ -20,7 +20,7 @@
                 </v-list-item>
             </template>
             <v-list-item v-for="(subitms, i) in item.amounts" :key="i" >
-                <v-list-item-subtitle>{{ subitms.category }} | {{ subitms.amount }} €</v-list-item-subtitle>
+                <v-list-item-subtitle>{{ getCategoryName(subitms.category) }} | {{ subitms.amount }} €</v-list-item-subtitle>
             </v-list-item>
         </v-list-group>
     </v-list>
@@ -28,14 +28,25 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits, ref } from 'vue';
-import { ExpenseItem, ExpenseSubItem, ExpenseItemSelection } from '@/model/componentModel'
+import { ExpenseItem, ExpenseSubItem, ExpenseItemSelection, Category, DBObject } from '@/model/componentModel'
 
-const props = defineProps<{ items:ExpenseItem[], modelValue:ExpenseItemSelection }>()
+const props = defineProps<{ items:ExpenseItem[], categories:Map<string, Category>, modelValue:ExpenseItemSelection }>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value:ExpenseItemSelection)
 }>()
 
 const selected = ref<ExpenseItemSelection>()
+
+function getCategoryName(key:string)
+{
+    let ret = "unknown"
+    if(props.categories.has(key))
+    {
+        ret = props.categories.get(key).title
+    }
+
+    return ret
+}
 
 function onSelected(index:number, data:ExpenseItem)
 {

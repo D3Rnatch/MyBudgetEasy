@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { Account, AccountImpl, User, UserImpl, Category, DBObject } from '@/model/componentModel'
+import { Account, AccountImpl, User, UserImpl, Category, DBObject, ExpenseItem } from '@/model/componentModel'
 import { ref } from 'vue'
 
 export const GLOBAL_NAME="global"
@@ -16,7 +16,9 @@ export interface AccountData {
     currentUser: any
     currentAccount: DBObject<Account>
     currentCategories: DBObject<Category>[]
+    categoriesDetails: Map<string, Category>
     accountsList: DBObject<Account>[]
+    accountExpenses:DBObject<ExpenseItem>[]
     loadingUserData:boolean
     loadingAccountData:boolean
     loadingCategories:boolean
@@ -41,7 +43,9 @@ export const useAccountDataStore = defineStore('accountData', {
             currentUser: ref<User>(new UserImpl),
             currentAccount: new DBObject<Account>(new AccountImpl as Account, ""),
             currentCategories: new Array<DBObject<Category>>(),
+            categoriesDetails: new Map<string, Category>(),
             accountsList: new Array<DBObject<Account>>(),
+            accountExpenses: new Array<DBObject<ExpenseItem>>(),
             loadingUserData:false,
             loadingAccountData:false,
             loadingCategories:false

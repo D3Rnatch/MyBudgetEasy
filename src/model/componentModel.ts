@@ -41,7 +41,7 @@ export interface ExpenseItem extends DBItem {
     totalAmount:number
     amounts: ExpenseSubItem[]
     description:string
-    id:number
+    id:string
     user:string
     timestamp:any
 }
@@ -52,7 +52,7 @@ export class ExpenseItemImpl implements ExpenseItem
     totalAmount: number
     amounts: ExpenseSubItem[]
     description: string
-    id: number
+    id: string
     user: string
     timestamp:any
 
@@ -63,8 +63,20 @@ export class ExpenseItemImpl implements ExpenseItem
         this.description = ""
         this.date = ""
         this.user = ""
-        this.id = -1
+        this.id =""
         this.timestamp = null
+    }
+
+    public addAmount(child:ExpenseSubItem)
+    {
+        this.totalAmount += child.amount
+        this.amounts.push(child)
+    }
+
+    public add(total:number, children:ExpenseSubItem[])
+    {
+        this.totalAmount = total
+        this.amounts = children
     }
 }
 

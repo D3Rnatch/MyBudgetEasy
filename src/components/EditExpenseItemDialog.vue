@@ -47,7 +47,7 @@ width="1024"
                             </p>
                         </v-col>
                         <v-col>
-                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="currentItem.amounts" :categories="categories"></UIExpenseAddition>
+                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="currentItem.amounts" :categories="categories" :categoryMap="props.categoryMap"></UIExpenseAddition>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -75,8 +75,8 @@ import { ExpenseItemImpl, Category, DBObject, ExpenseItem, UserLink } from '@/mo
 
 //*************************************** */
 // Component interface definition
-const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], users:UserLink[], item?:ExpenseItem }>()
-const emit = defineEmits(['update:modelValue', 'update:item'])
+const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], categoryMap:Map<string, Category>, users:UserLink[], item?:ExpenseItem }>()
+const emit = defineEmits(['update:modelValue', 'update:item', 'saveClicked'])
 
 
 //*************************************** */
@@ -127,7 +127,7 @@ const isValid = computed(() => {
 // Component methods
 
 watch(selectedUser, () => {
-    currentItem.value.user = selectedUser.value.name
+    currentItem.value.user = selectedUser.value.uid
 })
 
 watch(value, () => {
@@ -159,8 +159,19 @@ watch(value, () => {
 
 function onSave()
 {
+    console.log("Item to save " + JSON.stringify(currentItem.value))
+    
+    if(!props.edit)
+    {
+        console.log("Adding item ")
+        currentItem.value.date = new Date().toISOString()
+    }
+
     inputItem.value = currentItem.value
-    emit('update:item', inputItem.value)
+    
+    console.log("Item to save " + JSON.stringify(inputItem.value))
+
+    emit('saveClicked')
     value.value = false
 }
 
