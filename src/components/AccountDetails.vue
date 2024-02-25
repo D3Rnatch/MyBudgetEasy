@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import UIAccountExpenseList from '@/widgets/UIAccountExpenseList.vue';
 import EditExpenseItemDialog from '@/components/EditExpenseItemDialog.vue';
-import { ExpenseItem, ExpenseItemImpl, ExpenseItemSelection, ExpenseItemSelectionImpl } from '@/model/componentModel'
+import { ExpenseItem, ExpenseItemImpl, ExpenseItemSelection, ExpenseItemSelectionImpl, DBObject } from '@/model/componentModel'
 import { useAccountDataStore } from '@/store/globalStore'
 import { ref, watch, computed } from 'vue';
 import { useDataSyncManager } from '@/store/DataSyncManager'
@@ -84,8 +84,12 @@ const selectedItem = ref<ExpenseItemSelection>(new ExpenseItemSelectionImpl as E
 
 const newItem = ref(new ExpenseItemImpl)
 
-function onDelete(){
-    console.log("Delete")
+function onDelete()
+{
+    // Remove expense:
+    const tmp:DBObject<ExpenseItem> = items.value.at(selectedItem.value.index)
+    const sync = useDataSyncManager
+    sync.removeExpenseFromAccount(tmp)
 }
 
 function onAddEditExpenseSaveClicked()

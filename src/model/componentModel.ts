@@ -34,6 +34,7 @@ export class CategoryImpl implements Category {
 export interface ExpenseSubItem {
     amount:number
     category:string // Maps to UID of Category (not its title)
+    id:string
 }
 
 export interface ExpenseItem extends DBItem {

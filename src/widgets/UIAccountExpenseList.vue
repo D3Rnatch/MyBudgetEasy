@@ -4,22 +4,22 @@
         class="flex"
         max-height=500
     >
-        <v-list-group v-for="(item, i) in props.items" :key="i" :value="i" color="primary" @click="onSelected(i, item)">
+        <v-list-group v-for="(item, i) in props.items" :key="i" :value="i" color="primary" @click="onSelected(i, item.data)">
             <template v-slot:activator="{ props }">
                 <v-list-item v-bind="props">
                     <template v-slot:title>
-                        {{ item.description }} 
+                        {{ item.data.description }} 
                     </template>
                     <template v-slot:subtitle>
-                        {{ item.date }} | {{ item.totalAmount }} €
+                        {{ item.data.date }} | {{ item.data.totalAmount }} €
                     </template>
                     <template v-slot:prepend>
                         <v-icon :icon="'mdi-account-circle'"></v-icon>
-                        {{ item.user }}
+                        {{ item.data.user }}
                     </template>
                 </v-list-item>
             </template>
-            <v-list-item v-for="(subitms, i) in item.amounts" :key="i" >
+            <v-list-item v-for="(subitms, i) in item.data.amounts" :key="i" >
                 <v-list-item-subtitle>{{ getCategoryName(subitms.category) }} | {{ subitms.amount }} €</v-list-item-subtitle>
             </v-list-item>
         </v-list-group>
@@ -30,7 +30,7 @@
 import { defineProps, defineEmits, ref } from 'vue';
 import { ExpenseItem, ExpenseSubItem, ExpenseItemSelection, Category, DBObject } from '@/model/componentModel'
 
-const props = defineProps<{ items:ExpenseItem[], categories:Map<string, Category>, modelValue:ExpenseItemSelection }>()
+const props = defineProps<{ items:DBObject<ExpenseItem>[], categories:Map<string, Category>, modelValue:ExpenseItemSelection }>()
 const emit = defineEmits<{
   (event: 'update:modelValue', value:ExpenseItemSelection)
 }>()
@@ -65,7 +65,7 @@ function onSelected(index:number, data:ExpenseItem)
 
     if(replace)
     {
-        selected.value = { index:index, data:props.items.at(index) }
+        selected.value = { index:index, data:props.items.at(index).data }
         console.log("Selected " + index)
         emit('update:modelValue', selected.value)
     }

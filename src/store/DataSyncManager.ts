@@ -88,9 +88,8 @@ export class DataSyncManager
         })
 
         this.expensesSubscription_ = onSnapshot(this.expenseDAO_.getExpenses(this.dataStore_.currentAccount.id), (snapshot) => {
-
             // Finalized model:
-            const rootElems = new Array<ExpenseItem>()
+            const rootElems = new Array<DBObject<ExpenseItem>>()
             const childrenElem = new Map<string, {total:number, data:Array<ExpenseSubItem>}>()
 
             // Items are linked by the reference of the parent using its ID.
@@ -100,7 +99,7 @@ export class DataSyncManager
                 const content = data.data() as Expense                
                 if(content.type === ExpenseType.PARENT)
                 {
-                    const item:ExpenseItemImpl = new ExpenseItemImpl()
+                    const item:ExpenseItemImpl = new ExpenseItemImpl
                     item.date = content.date
                     item.description = content.comment
                     item.user = content.owner
@@ -108,11 +107,11 @@ export class DataSyncManager
 
                     if(!content.childNumber)
                     {
-                        const subItem = {amount:content.amount, category: content.category} as ExpenseSubItem
+                        const subItem = {amount: content.amount, category: content.category, id: ""} as ExpenseSubItem
                         item.addAmount(subItem)
                     }
 
-                    rootElems.push(item)
+                    rootElems.push(new DBObject(item, item.id))
                 }
                 else
                 {
@@ -123,16 +122,16 @@ export class DataSyncManager
 
                     const itm = childrenElem.get(content.parent)
                     itm.total += content.amount
-                    itm.data.push({ amount:content.amount, category: content.category } as ExpenseSubItem)
+                    itm.data.push({ amount:content.amount, category: content.category, id: data.id.toString() } as ExpenseSubItem)
                 }
             })
 
-            rootElems.forEach((root:ExpenseItemImpl) => {
+            rootElems.forEach((root:DBObject<ExpenseItemImpl>) => {
 
                 if(childrenElem.has(root.id))
                 {
                     const itm = childrenElem.get(root.id)
-                    root.add(itm.total, itm.data)
+                    root.data.add(itm.total, itm.data)
                 }
             })
 
@@ -148,13 +147,17 @@ export class DataSyncManager
 
         this.accountsSubscription_()
         this.accountsSubscription_ = null
+
+        this.categoriesSubscription_()
+        this.categoriesSubscription_ = null
+
+        this.expensesSubscription_()
+        this.expensesSubscription_ = null
     }
 
 
     public addExpenseToCurrentAccount(expense:ExpenseItem)
     {
-        // TODO: Use the Account UID instead of NAME.
-
         console.log("addExpenseToCurrentAccount " + expense.amounts.length + " account " + " date " + expense.date)
         this.checkAndInitialize()
 
@@ -207,6 +210,22 @@ export class DataSyncManager
 
             this.expenseDAO_.addExpense(this.dataStore_.currentAccount.id, rootExpense, new Array<Expense>())
         }
+    }
+
+    public removeExpenseFromAccount(expense:DBObject<ExpenseItem>)
+    {
+        const arr = new Array<string>()
+        
+        arr.push(expense.id)
+
+        if(expense.data.amounts.length > 1)
+        {
+            expense.data.amounts.forEach((value:ExpenseSubItem) => {
+                arr.push(value.id)
+            })
+        }
+
+        this.expenseDAO_.removeExpense(this.dataStore_.currentAccount.id, arr)
     }
 
     private checkAndInitialize()
