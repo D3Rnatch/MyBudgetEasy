@@ -11,7 +11,7 @@
                         {{ item.data.description }} 
                     </template>
                     <template v-slot:subtitle>
-                        {{ item.data.date }} | {{ item.data.totalAmount }} €
+                        {{ decoratedDate(item.data.date) }} | {{ item.data.totalAmount }} €
                     </template>
                     <template v-slot:prepend>
                         <v-icon :icon="'mdi-account-circle'"></v-icon>
@@ -81,6 +81,12 @@ function onSelected(index:number, data:DBObject<ExpenseItem>)
         selectedItem.value = selected.value
         //emit('update:modelValue', selected.value)
     }
+}
+
+function decoratedDate(value:string)
+{
+    let date = new Date(value)
+    return date.toISOString().substring(0, 10)
 }
 
 </script>

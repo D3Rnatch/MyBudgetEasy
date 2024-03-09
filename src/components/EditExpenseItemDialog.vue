@@ -26,7 +26,7 @@ width="1024"
                                 label="Description"
                             ></v-text-field>
                             <v-text-field
-                                v-model="currentItem.date"
+                                v-model="itemDate"
                                 required
                                 clearable
                                 clear-icon="mdi-close"
@@ -125,6 +125,13 @@ const isValid = computed(() => {
 })
 
 
+const itemDate = computed(() => {
+    if(currentItem.value.date)
+        return decoratedDate(currentItem.value.date)
+    else
+        return "xxxx-xx-xx"
+})
+
 //*************************************** */
 // Component methods
 
@@ -157,6 +164,8 @@ watch(value, () => {
             currentItem.value.user = props.users.at(0).uid
             console.log("restoring to default END is amounts valid " + currentItem.value.totalAmount)
         }
+
+        currentItem.value.date = (new Date()).toISOString();
     }
 })
 
@@ -164,12 +173,6 @@ function onSave()
 {
     console.log("Item to save " + JSON.stringify(currentItem.value) + " refId " + refId.value)
     
-    if(!props.edit)
-    {
-        console.log("Adding item ")
-        currentItem.value.date = new Date().toISOString()
-    }
-
     const item = new DBObject<ExpenseItem>(currentItem.value, refId.value)
     
     emit('saveClicked', item)
@@ -184,6 +187,12 @@ function increaseTotalAmount(amount:number)
 function decreaseTotalAmount(amount:number)
 {
     currentItem.value.totalAmount -= amount
+}
+
+function decoratedDate(value:string)
+{
+    let date = new Date(value)
+    return date.toISOString().substring(0, 10);
 }
 
 </script>
