@@ -95,6 +95,12 @@ onBeforeMount(() => {
   dataSyncManager.syncData(() => {
     dataLoadPending.value = false
 
+    // If no account is associated to the User, open the Add Account Dialog:
+    if(store.currentUser.value.accounts.length === 0)
+    {
+        addAccountFlag.value = true
+    }
+
     console.log("Loaded categories " + JSON.stringify(store.currentCategories))
   })
 })
