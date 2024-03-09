@@ -1,5 +1,5 @@
 import { useFirestore } from 'vuefire'
-import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, startAfter, addDoc, query, where, deleteDoc, DocumentData, limit } from 'firebase/firestore'
+import { collection, doc, setDoc, writeBatch, getDocs, Firestore, PartialWithFieldValue, startAfter, addDoc, query, where, deleteDoc, DocumentData, limit } from 'firebase/firestore'
 import { converter } from '@/dao/DAOUtils'
 
 export enum ExpenseType
@@ -92,9 +92,25 @@ export class ExpensesDAO
                     })
     }
 
-    public updateExpense(accountKey:string, expense:Expense)
+    public async updateExpense(accountKey:string, rootExpense:Expense, childExpenses:Expense[])
     {
-        setDoc(doc(this.db_, this.expenseCollectionName_, accountKey, expense.id).withConverter<Expense, DocumentData>(converter<Expense>()), expense)
+        const rootRef = doc(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_, rootExpense.id).withConverter<Expense, DocumentData>(converter<Expense>())
+        setDoc(rootRef, rootExpense)
+
+        childExpenses.forEach((item:Expense) => {               
+                let rf:any = null
+                if(item.id)
+                {
+                    rf = doc(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_, item.id).withConverter<Expense, DocumentData>(converter<Expense>())
+                }
+                else
+                {
+                    rf = doc(collection(this.db_, this.expenseCollectionName_, accountKey, this.expenseCollectionName_)).withConverter<Expense, DocumentData>(converter<Expense>())
+                    item.id = rf.id
+                }
+
+                setDoc(rf, item)
+        })
     }
 
     public removeExpense(accountKey:string, ids:string[])
@@ -104,4 +120,10 @@ export class ExpensesDAO
             deleteDoc(doc(this.db_, this.expenseCollectionName_+"/"+accountKey+"/"+this.expenseCollectionName_+"/"+value))
         })
     }
+    
+    public removeUnitary(accountKey:string, id:string)
+    {
+        deleteDoc(doc(this.db_, this.expenseCollectionName_+"/"+accountKey+"/"+this.expenseCollectionName_+"/"+id))
+    }
+
 }

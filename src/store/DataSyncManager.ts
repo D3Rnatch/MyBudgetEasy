@@ -214,12 +214,56 @@ export class DataSyncManager
 
     public updateExpenseOnAccount(expense:DBObject<ExpenseItem>)
     {
-        console.log("updateExpenseOnAccount - removed from account " + JSON.stringify(expense))
-        // Remove
-        this.removeExpenseFromAccount(expense)
+        // Convert expenses:
+        const items:Expense[] = new Array<Expense>()
+        
+        // Determine if items were removed from the expense:
+        const originalItem = this.dataStore_.accountExpenses.find((item:DBObject<ExpenseItem>) =>  item.id === expense.id )
 
-        // Then add
-        this.addExpenseToCurrentAccount(expense.data)
+        const listOfOriginalIds = new Map<string, ExpenseSubItem>()
+        
+        originalItem.data.amounts.forEach((subitem) => {
+            listOfOriginalIds.set(subitem.id, subitem)
+        })
+
+        // Expense id is never null.
+        expense.data.amounts.forEach((item:ExpenseSubItem) => {
+
+            items.push({
+                type:ExpenseType.CHILD
+                , category:item.category
+                , amount:item.amount
+                , id:item.id 
+                , date:""
+                , owner:""
+                , comment:""
+                , parent:expense.id
+                , childNumber:0
+            })
+
+            if(listOfOriginalIds.has(item.id))
+            {
+                listOfOriginalIds.delete(item.id)
+            }
+        })
+
+        // Finally update the root element:
+        const rootExpense = { type:ExpenseType.PARENT
+            , category:expense.data.amounts[0].category
+            , amount:expense.data.amounts[0].amount
+            , id:expense.id 
+            , date:expense.data.date
+            , owner:expense.data.user
+            , comment:expense.data.description
+            , parent:""
+            , childNumber:0
+        }
+
+        this.expenseDAO_.updateExpense(this.dataStore_.currentAccount.id, rootExpense, items)
+
+        listOfOriginalIds.forEach((value:ExpenseSubItem, key:string) => {
+            this.expenseDAO_.removeUnitary(this.dataStore_.currentAccount.id, key)
+        })
     }
 
     public removeExpenseFromAccount(expense:DBObject<ExpenseItem>)
