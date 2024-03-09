@@ -32,15 +32,27 @@
         // store.auth_userid = ""
         // Check User still exists on database.
         // goToAppPage();
+
+        console.log("Past logged in " + store.auth_userid)
     }
 
     function prepareAndGoToAppPage(){
         store.authenticated = true
         store.auth_userid = auth.currentUser.uid
+
         goToAppPage()
     }
 
     function goToAppPage() {
-        router.replace('account/dashboard') // Will load the default Account
+        const hasAccount = true
+        if(hasAccount)
+        {
+            router.replace('account/dashboard')
+        }
+        else
+        {
+            router.replace('account')
+        }
+        //router.replace('account/dashboard') // Will load the default Account
     }
 </script>

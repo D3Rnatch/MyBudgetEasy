@@ -1,45 +1,48 @@
 <template>
-        <!-- Defines the input to add an expense with input button -->
-        <div class="d-flex flex-row">
-            <v-text-field
-                label="Expense amount"
-                v-model="newAmount"
-                class="mr-2"
-                clearable
-                clear-icon="mdi-close"
-                variant="solo-filled"
-            ></v-text-field>
-            <v-combobox
-                label="Category"
-                :items="props.categories"
-                class="ml-2 mr-2"
-                v-model="currentCategory"
-            />
-            <v-btn density="comfortable" icon="mdi-plus" class="ma-0 mt-3" @click="add" :disabled="!conditionValid"></v-btn>
-        </div>
-        <v-list height="195" bg-color="grey-lighten-2">
-            <v-list-item v-for="(item, index) in value" :key="index">
-                <v-list-item-title>
-                    {{ item.amount }} €
-                </v-list-item-title>
-                <template v-slot:subtitle>
-                    {{ item.category }}
-                </template>
-                <template v-slot:append>
-                        <v-icon :icon="'mdi-delete'" @click="remove(index)"></v-icon>
-                </template>
-            </v-list-item>
-        </v-list>
+    <!-- Defines the input to add an expense with input button -->
+    <div class="d-flex flex-row">
+        <v-text-field
+            label="Expense amount"
+            v-model="newAmount"
+            class="mr-2"
+            clearable
+            clear-icon="mdi-close"
+            variant="solo-filled"
+        ></v-text-field>
+        <v-combobox
+            label="Category"
+            :items="props.categories"
+            class="ml-2 mr-2 h-0 w-0"
+            v-model="currentCategory"
+            item-title="data.title"
+        />
+        <v-btn density="comfortable" icon="mdi-plus" class="ma-0 mt-3" @click="add" :disabled="!conditionValid"></v-btn>
+    </div>
+    <v-list height="195" bg-color="grey-lighten-2">
+        <v-list-item v-for="(item, index) in value" :key="index">
+            <v-list-item-title>
+                {{ item.amount }} €
+            </v-list-item-title>
+            <template v-slot:subtitle>
+                {{ getCategoryName(item.category) }}
+            </template>
+            <template v-slot:append>
+                    <v-icon :icon="'mdi-delete'" @click="remove(index)"></v-icon>
+            </template>
+        </v-list-item>
+    </v-list>
 </template>
 
 
 <script setup lang="ts">
 import { ref, defineEmits, defineProps, computed } from 'vue'
-import { Category, ExpenseSubItem } from '@/model/componentModel'
+import { Category, ExpenseSubItem, DBObject } from '@/model/componentModel'
+import { equalTo } from 'firebase/database';
 
 interface Props {
     modelValue:ExpenseSubItem[]
-    categories:Category[]
+    categories:DBObject<Category>[]
+    categoryMap:Map<string, Category>
 }
 
 const props = defineProps<Props>()
@@ -55,7 +58,8 @@ const value = computed(() => {
 })
 
 const newAmount = ref<string>("")
-const currentCategory=ref<Category>(props.categories.at(0))
+const currentCategory=ref<DBObject<Category>>(props.categories.at(0))
+
 
 const conditionValid = computed(() => {
     let status = false
@@ -67,8 +71,19 @@ const conditionValid = computed(() => {
     return status
 })
 
+function getCategoryName(key:string)
+{
+    let ret = "unknown"
+    if(props.categoryMap.has(key))
+    {
+        ret =  props.categoryMap.get(key).title
+    }
+
+    return ret;
+}
+
 function add(){
-    value.value.push({amount: +(newAmount.value), category:currentCategory.value.title})
+    value.value.push({amount: +(newAmount.value), category:currentCategory.value.id})
     emit('update:modelValue', value.value)
     emit('added', Number(newAmount.value))
     newAmount.value=""

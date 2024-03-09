@@ -26,7 +26,7 @@ width="1024"
                                 label="Description"
                             ></v-text-field>
                             <v-text-field
-                                v-model="currentItem.date"
+                                v-model="itemDate"
                                 required
                                 clearable
                                 clear-icon="mdi-close"
@@ -36,17 +36,18 @@ width="1024"
                             ></v-text-field>
                             <v-combobox
                                 v-model="selectedUser"
-                                :items="users"
+                                :items="props.users"
                                 density="comfortable"
                                 label="User"
                                 rounded="1"
+                                item-title="name"
                             ></v-combobox>
                             <p>
                                 Amount: {{ currentItem.totalAmount }} €
                             </p>
                         </v-col>
                         <v-col>
-                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="currentItem.amounts" :categories="categories"></UIExpenseAddition>
+                            <UIExpenseAddition @added="increaseTotalAmount" @removed="decreaseTotalAmount" v-model="currentItem.amounts" :categories="categories" :categoryMap="props.categoryMap"></UIExpenseAddition>
                         </v-col>
                     </v-row>
                 </v-container>
@@ -70,16 +71,18 @@ width="1024"
 <script setup lang="ts">
 import { defineProps, computed, defineEmits, ref, watch } from 'vue'
 import UIExpenseAddition from '@/widgets/UIExpenseAddition.vue';
-import { ExpenseItemImpl, Category, ExpenseSubItem, ExpenseItem } from '@/model/componentModel'
+import { ExpenseItemImpl, Category, DBObject, ExpenseItem, UserLink } from '@/model/componentModel'
 
 //*************************************** */
 // Component interface definition
-const props = defineProps<{ modelValue:boolean, edit:boolean, item?:ExpenseItem }>()
-const emit = defineEmits(['update:modelValue', 'update:item'])
+const props = defineProps<{ modelValue:boolean, edit:boolean, categories:DBObject<Category>[], categoryMap:Map<string, Category>, users:UserLink[], item?:DBObject<ExpenseItem> }>()
+const emit = defineEmits(['update:modelValue', 'update:item', 'saveClicked'])
 
 
 //*************************************** */
 // Ref definition
+const refId = ref(props.item? props.item.id : "")
+
 const currentItem = ref(new ExpenseItemImpl as ExpenseItem)
 
 const pwdRules = [
@@ -89,20 +92,7 @@ const pwdRules = [
     },
 ]
 
-const categories = ref([
-    {title: "Title1", color:"#0c0c0c", max:253, amount: 300},
-    {title: "Title2", color:"cyan", max:278, amount: 90},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-])
-
-const users = ref([
-    {uid:"123456", title: "Norman"},
-    {uid:"123456", title: "Jacob"},
-    {uid:"123456", title: "Pierre"}
-])
-
-const selectedUser = ref(users.value.at(0))
+const selectedUser = ref(props.users.at(0))
 
 //*************************************** */
 // Computed definition
@@ -135,11 +125,18 @@ const isValid = computed(() => {
 })
 
 
+const itemDate = computed(() => {
+    if(currentItem.value.date)
+        return decoratedDate(currentItem.value.date)
+    else
+        return "xxxx-xx-xx"
+})
+
 //*************************************** */
 // Component methods
 
 watch(selectedUser, () => {
-    currentItem.value.user = selectedUser.value.title
+    currentItem.value.user = selectedUser.value.uid
 })
 
 watch(value, () => {
@@ -153,7 +150,8 @@ watch(value, () => {
         if(value.value)
         {
             console.log("Setting up edition ON")
-            currentItem.value = structuredClone(props.item);
+            currentItem.value = structuredClone(props.item.data);
+            refId.value = (props.item? props.item.id : "")
             console.log("Setting up edition END")
         }
     }
@@ -163,34 +161,21 @@ watch(value, () => {
         {
             console.log("restoring to default ON")
             currentItem.value = (new ExpenseItemImpl as ExpenseItem)
-            currentItem.value.user = users.value.at(0).title
+            currentItem.value.user = props.users.at(0).uid
             console.log("restoring to default END is amounts valid " + currentItem.value.totalAmount)
         }
-    }
 
-/*    if(value.value && props.edit && props.item)
-    {
-        // When displaying the popup,
-        currentItem.value = structuredClone(props.item);
+        currentItem.value.date = (new Date()).toISOString();
     }
-    /*else if(!value.value)
-    {
-        console.log("TEST 2a")
-        // Clear all fields
-        currentItem.value.amounts = []
-        currentItem.value.date = ""
-        currentItem.value.description = ""
-        currentItem.value.id = -1
-        currentItem.value.totalAmount = 0
-        currentItem.value.user = users.value.at(0).title
-        console.log("TEST 2b")
-    } */
 })
 
 function onSave()
 {
-    inputItem.value = currentItem.value
-    emit('update:item', inputItem.value)
+    console.log("Item to save " + JSON.stringify(currentItem.value) + " refId " + refId.value)
+    
+    const item = new DBObject<ExpenseItem>(currentItem.value, refId.value)
+    
+    emit('saveClicked', item)
     value.value = false
 }
 
@@ -202,6 +187,12 @@ function increaseTotalAmount(amount:number)
 function decreaseTotalAmount(amount:number)
 {
     currentItem.value.totalAmount -= amount
+}
+
+function decoratedDate(value:string)
+{
+    let date = new Date(value)
+    return date.toISOString().substring(0, 10);
 }
 
 </script>

@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     <div class="d-flex flex-column">
-                        <UIAccountExpenseList :items="items" v-model="selectedItem" class="w-100 h-100"></UIAccountExpenseList>
+                        <UIAccountExpenseList :items="items" :categories="categoryMap" v-model="selectedItem" class="w-100 h-100"></UIAccountExpenseList>
                         <v-pagination
                             v-model="currentPage"
                             :length="numberOfPages"
@@ -38,27 +38,37 @@
             </v-col>
         </v-row>
     </v-container>
-    <EditExpenseItemDialog v-model="addExpense" :edit="false"></EditExpenseItemDialog>
-    <EditExpenseItemDialog v-model="editExpense" :edit="true" v-model:item="selectedItem.data"></EditExpenseItemDialog>
+    <EditExpenseItemDialog 
+        v-model="addExpense" 
+        :edit="false" 
+        :categories="categories" 
+        :categoryMap="categoryMap" 
+        :users="users" 
+        v-model:item="newItem" 
+        @save-clicked="onAddExpenseSaveClicked"
+    />
+    <EditExpenseItemDialog 
+        v-model="editExpense" 
+        :edit="true" 
+        v-model:item="selectedItem.data" 
+        :categories="categories" 
+        :categoryMap="categoryMap" 
+        :users="users" 
+        @save-clicked="onEditExpenseSaveClicked" 
+    />
 
 </template>
 
 <script setup lang="ts">
 import UIAccountExpenseList from '@/widgets/UIAccountExpenseList.vue';
 import EditExpenseItemDialog from '@/components/EditExpenseItemDialog.vue';
-import { ExpenseItem, ExpenseItemSelection, ExpenseItemSelectionImpl } from '@/model/componentModel'
+import { ExpenseItem, ExpenseItemImpl, ExpenseItemSelection, ExpenseItemSelectionImpl, DBObject } from '@/model/componentModel'
+import { useAccountDataStore } from '@/store/globalStore'
+import { ref, watch, computed } from 'vue';
+import { useDataSyncManager } from '@/store/DataSyncManager'
+const store = useAccountDataStore()
 
-import { ref, watch } from 'vue';
-
-const items = ref<ExpenseItem[]>([
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"}, {amount: 15, category:"Title2" } ], description:"BlaBlaBla", id:7, user:"Toto"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"sfgsdfgxbbxv", id:6, user:"Toto"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"BlaBlaBla", id:5, user:"Alex"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"BlaBlaBla", id:4, user:"Francis"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"BlaBla", id:3, user:"Toto"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"BlaBlaBla", id:2, user:"George"},
-    {date:"2023/10/12", totalAmount: 27, amounts: [ {amount: 12, category:"Title1"} ], description:"BlaBlaBla", id:1, user:"Toto"},
-])
+const items = computed(() => { return store.accountExpenses });
 
 const addExpense = ref<boolean>(false)
 const editExpense = ref<boolean>(false)
@@ -82,21 +92,50 @@ const currentPage = ref(1)
 
 const selectedFilter = ref("Past Month")
 
-const categories = ref([
-    {title: "Title1", color:"#0c0c0c", max:253, amount: 300},
-    {title: "Title2", color:"cyan", max:278, amount: 90},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-    {title: "Title3", color:"#555555", max:115, amount: 50},
-])
+const categories = computed(() => { return store.currentCategories })
+const categoryMap = computed(() => { return store.categoriesDetails })
+const users = computed(() => { return store.currentAccount.data.users } )
 
 const selectedItem = ref<ExpenseItemSelection>(new ExpenseItemSelectionImpl as ExpenseItemSelection)
 
-function onDelete(){
-    console.log("Delete")
+const newItem = ref(new DBObject<ExpenseItem>(new ExpenseItemImpl, ""))
+
+function onDelete()
+{
+    // Remove expense:
+    const tmp:DBObject<ExpenseItem> = items.value.at(selectedItem.value.index)
+    const sync = useDataSyncManager
+    sync.removeExpenseFromAccount(tmp)
+    clearSelection()
 }
 
+function onAddExpenseSaveClicked(item:DBObject<ExpenseItem>)
+{
+    console.log("onAddEditExpenseSaveClicked " + JSON.stringify(item))
+    // Sync with database the last received expense:
+    const sync = useDataSyncManager
+    sync.addExpenseToCurrentAccount(item.data)
+}
+
+function onEditExpenseSaveClicked(item:DBObject<ExpenseItem>)
+{
+    console.log("onAddEditExpenseSaveClicked " + JSON.stringify(item))
+    const sync = useDataSyncManager
+    sync.updateExpenseOnAccount(item)
+    clearSelection()
+}
+
+function clearSelection()
+{
+    selectedItem.value.index = -1
+}
+
+watch(newItem, () => {
+    console.log("Has changed " + JSON.stringify(newItem.value))
+})
+
 watch(selectedItem, () => {
-    console.log("Is SelectedItem defined " + selectedItem.value.data.description)
+    console.log("Is SelectedItem defined " + JSON.stringify(selectedItem.value))
 })
 
 </script>

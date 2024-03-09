@@ -1,6 +1,13 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 
+/*
+ - Start: LoginVue
+ - Only dynamic roots are authorized
+ - If account => Summary View
+ - If no account => Create Account View
+ - Once an account is created => Summary View
+*/
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -14,7 +21,7 @@ const routes: Array<RouteRecordRaw> = [
       // reject the navigation
       return true
     },
-    component: () => import(/* webpackChunkName: "account" */ '../views/HomeView.vue')
+    component: () => import(/* webpackChunkName: "account" */ '../views/CreateAccountView.vue')
   },
   {
     path: '/account/dashboard',

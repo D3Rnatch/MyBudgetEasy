@@ -1,8 +1,8 @@
 import { useCollection, useFirestore } from 'vuefire'
-import { collection, doc, setDoc, getDocs, Firestore, PartialWithFieldValue, QueryDocumentSnapshot, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData } from 'firebase/firestore'
+import { collection, doc, setDoc, getDocs, Firestore, addDoc, query, where, deleteDoc, getDoc, serverTimestamp, DocumentData, documentId } from 'firebase/firestore'
 import { converter, tsConverter } from '@/dao/DAOUtils'
 
-import { Account, Category } from '@/store/accountModel'
+import { Account, Category } from '@/model/componentModel'
 
 
 enum PathTypes {
@@ -37,11 +37,23 @@ export class AccountDAO
      * Fetches the account by searching for the matching Document ID
      * @param accountKey Document ID value in accounts
      * @returns the corresponding doc reference if any found.
+     * NOT WORKING.
      */
     public getAccount(accountKey: string)
     {
-        return doc(this.db_, this.buildPaths(PathTypes.Account, ""), accountKey)
+        return doc(this.db_, this.buildPaths(PathTypes.Account, "") + "/" + accountKey)
                         .withConverter<Account, DocumentData>(converter<Account>())
+    }
+
+    /**
+     * Fetches the accounts by searching for the matching Document ID provided as input argument.
+     * This method limits the fetch to 10 elements due to the use of "in" parameter in query.
+     * @param accountList Document ID value in accounts as string array.
+     * @returns the created query reference object.
+     */
+    public getAccounts(accountList:string[])
+    {
+        return query(collection(this.db_, this.buildPaths(PathTypes.Account, "")).withConverter<Account, DocumentData>(converter<Account>()), where('__name__', 'in', accountList))
     }
 
     /**
@@ -52,10 +64,11 @@ export class AccountDAO
     */
     public addAccount(accountCls:Account):string
     {
-        const account = tsConverter<Account>().from(accountCls)
-        account.timestamp = serverTimestamp()
-        const localDocRef = doc(collection(this.db_, this.buildPaths(PathTypes.Account, "")).withConverter<Account, DocumentData>(converter<Account>()))
-        setDoc(localDocRef, account)
+        const data = tsConverter<Account>().from(accountCls)        
+
+        const localDocRef = doc(collection(this.db_, this.buildPaths(PathTypes.Account, ""))
+                                .withConverter<Account, DocumentData>(converter<Account>()))
+        setDoc(localDocRef, data)
         return localDocRef.id
     }
 
@@ -68,7 +81,7 @@ export class AccountDAO
     {
         for(let i=0; i< categories.length; ++i)
         {
-            const cat = categories[i]
+            const cat = tsConverter<Category>().from(categories[i])
             cat.timestamp = serverTimestamp()
             addDoc(collection(this.db_, this.buildPaths(PathTypes.Categories, accountId))
                                 .withConverter<Category, DocumentData>(converter<Category>()), cat)
@@ -83,7 +96,7 @@ export class AccountDAO
     public getCategories(accountKey: string)
     {
         return collection(this.db_, this.buildPaths(PathTypes.Categories, accountKey))
-                                .withConverter<Category[], DocumentData>(converter<Category[]>())
+                                .withConverter<Category, DocumentData>(converter<Category>())
     }
 
     /**
@@ -92,7 +105,7 @@ export class AccountDAO
      * @param title Find by title
      */
     public async removeCategory(id:string, title:string)
-    {        
+    {
         const col = collection(this.db_, this.buildPaths(PathTypes.Categories, id))
 
         const q = query(col, where("title", "==", title));

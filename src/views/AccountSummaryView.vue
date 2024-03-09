@@ -1,54 +1,19 @@
 <template>
-    <v-layout class="rounded rounded-md">
-        <v-app-bar color="secondary-darken-1">
-            <v-app-bar-nav-icon @click="drawerOpening = !drawerOpening"></v-app-bar-nav-icon>
-            <v-toolbar-title>{{ accountName }}</v-toolbar-title>
-            <template v-slot:extension>
-                <v-tabs
-                v-model="tab"
-                align-tabs="title"
-                >
-                    <v-tab
-                        v-for="(item, index) in tabs"
-                        :key="index"
-                        :value="index"
-                    >
-                        {{ item }}
-                    </v-tab>
-                </v-tabs>
-            </template>
-            <div class="d-flex">
-                <v-icon :icon="'mdi-account-circle'" class="ma-4 mr-0"></v-icon>
-                <p class="ma-4">{{ currentUser }}</p>
-            </div>
-        </v-app-bar>
-        <v-navigation-drawer
-            v-model="drawerOpening"
-            width="300"
-            temporary
-        >
-            <div class="d-flex flex-row justify-space-between">
-                <v-list-item
-                    prepend-icon="mdi-account-circle"
-                    :title="currentUser"
-                ></v-list-item>
-                <v-btn density="comfortable" icon="mdi-plus"></v-btn>
-            </div>
-
-            <v-divider></v-divider>
-
-            <v-list density="compact" nav>
-                <v-list-item v-for="(item, i) in accounts" :key="i" :value="i" prepend-icon="mdi-view-dashboard" :title="item">
-                </v-list-item>
-            </v-list>
-            <template v-slot:append>
-                <div class="pa-2">
-                <v-btn prepend-icon="mdi-logout">
-                    Logout
-                </v-btn>
-                </div>
-            </template>
-        </v-navigation-drawer>
+    <v-layout class="rounded rounded-md" v-if="dataLoadPending">
+        <v-main>
+            <v-progress-circular color="primary" indeterminate ></v-progress-circular>
+        </v-main>
+    </v-layout>
+    <v-layout class="rounded rounded-md" v-if="!dataLoadPending">
+        <UIAppBar v-model:sidePanelOpenFlag="drawerOpening" v-model:selectedTab="tab" :title="accountName" :username="currentUser" :tabs="tabs"></UIAppBar>
+        <UINavigationDrawer 
+            v-model:side-panel-open-flag="drawerOpening" 
+            v-model:add-account-flag="addAccountFlag" 
+            v-model:join-account="joinAccount"
+            :username="currentUser"
+            :accounts="accountsList"
+            @selected-account-changed="onAccountSelectionChange"
+        ></UINavigationDrawer>
         <v-main>
             <v-window v-model="tab">
                 <v-window-item value=0>
@@ -66,28 +31,74 @@
             </v-window>
         </v-main>
     </v-layout>
+    <AddAccountDialog v-model:openFlag="addAccountFlag" v-model:account="account" v-model:categories="categories" @success="onAccountAdditionValidation"></AddAccountDialog>
 </template>
 
 <script setup lang="ts">
-
+import { onBeforeMount } from 'vue'
 import AccountDetails from '@/components/AccountDetails.vue';
 import AccountSummary from '@/components/AccountSummary.vue';
-import { ref, computed } from 'vue';
+import AddAccountDialog from '@/components/AddAccountDialog.vue';
+import UIAppBar from '@/widgets/UIAppBar.vue';
+import UINavigationDrawer from '@/widgets/UINavigationDrawer.vue';
+import { computed, ref, watch } from 'vue';
+import { Category, Account, AccountImpl, DBObject } from '@/model/componentModel'
+import { useAccountDataStore } from '@/store/globalStore'
+import { dbManagerInterface } from '@/controller/dbManagerInterface';
+import { useDataSyncManager } from '@/store/DataSyncManager';
 
-const accountName = ref("AccountName")
+const dataSyncManager = useDataSyncManager
+const store = useAccountDataStore()
+const accountsList = computed(() => { return store.accountsList });
+const accountName = computed(() => { return store.currentAccount.data.name });
+const dataLoadPending = ref(true) // Init of component is about loading data
 const currentUser = ref("UserName")
 const drawerOpening = ref(false)
-
+const joinAccount=ref(false)
 const tab = ref("Expenses")
 
 const tabs = ref([
     "Detailed", "Summary", "Account Setup", "Exports"
 ])
 
-const accounts = ref([
-    "AB_SB_MainAccount",
-    "MyBudget",
-    "VacAvecLesPotos"
-])
+const addAccountFlag = ref(false)
+
+const account = ref<Account>()
+const categories = ref<Category[]>()
+
+watch(account, () => {
+    if(account.value)
+    {
+        console.log("Assigned to " + account.value.name)
+    }
+})
+
+function onAccountAdditionValidation()
+{
+    console.log("Adding this account to db")
+    dbManagerInterface.getInstance().addAccount(account.value, categories.value)
+}
+
+function onAccountSelectionChange(item:DBObject<Account>, index:number)
+{
+    console.log("onAccountSelectionChange " + JSON.stringify(item) + " at " + index)
+    store.currentAccount = item
+    dataSyncManager.syncCurrentAccount(() => {
+        console.log("Current Account Synched")
+    })
+}
+
+onBeforeMount(() => {
+  console.log(`the component is now mounted.`)
+
+  // Start loading stuff:
+  dataSyncManager.syncData(() => {
+    dataLoadPending.value = false
+
+    console.log("Loaded categories " + JSON.stringify(store.currentCategories))
+  })
+})
+
+
 
 </script>

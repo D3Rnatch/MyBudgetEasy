@@ -1,5 +1,6 @@
 import { defineStore } from "pinia"
-import { Account, AccountImpl, User, UserImpl, Category } from './accountModel'
+import { Account, AccountImpl, User, UserImpl, Category, DBObject, ExpenseItem } from '@/model/componentModel'
+import { ref } from 'vue'
 
 export const GLOBAL_NAME="global"
 
@@ -12,9 +13,15 @@ export interface State {
 export interface AccountData {
     tmpAccount: Account
     tmpCategories: Category[]
-    currentUser: User
-    currentAccount: Account
-    currentCategories: Category[]
+    currentUser: any
+    currentAccount: DBObject<Account>
+    currentCategories: DBObject<Category>[]
+    categoriesDetails: Map<string, Category>
+    accountsList: DBObject<Account>[]
+    accountExpenses:DBObject<ExpenseItem>[]
+    loadingUserData:boolean
+    loadingAccountData:boolean
+    loadingCategories:boolean
 }
 
 export const useGlobalStore = defineStore('global', {
@@ -24,7 +31,7 @@ export const useGlobalStore = defineStore('global', {
             authenticated: false,
         }
     },
-    persist: false
+    persist: true
 })
 
 
@@ -33,9 +40,15 @@ export const useAccountDataStore = defineStore('accountData', {
         return {
             tmpAccount: new AccountImpl,
             tmpCategories: [],
-            currentUser: new UserImpl,
-            currentAccount: null,
-            currentCategories: null,
+            currentUser: ref<User>(new UserImpl),
+            currentAccount: new DBObject<Account>(new AccountImpl as Account, ""),
+            currentCategories: new Array<DBObject<Category>>(),
+            categoriesDetails: new Map<string, Category>(),
+            accountsList: new Array<DBObject<Account>>(),
+            accountExpenses: new Array<DBObject<ExpenseItem>>(),
+            loadingUserData:false,
+            loadingAccountData:false,
+            loadingCategories:false
         }
     }
 })
