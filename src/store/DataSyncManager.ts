@@ -36,6 +36,7 @@ export class DataSyncManager
 
         // Get User data :
         this.userSubscription_ = onSnapshot( this.userDAO_.getUser(this.globalStore_.auth_userid), (snapshot) => {
+
             this.dataStore_.currentUser.value = snapshot.data()
 
             const arr:string[] = []
@@ -43,30 +44,40 @@ export class DataSyncManager
                 arr.push( account.key as string )
             })
 
-            this.accountsSubscription_ = onSnapshot(this.accountDAO_.getAccounts(arr), (data) => {              
-                    data.forEach((content) => {
-                        const index = this.dataStore_.accountsList.findIndex((el) => el.name === content.data().name) 
-                        if(index !== -1)
+            if(snapshot.data().accounts.length)
+            {
+                this.accountsSubscription_ = onSnapshot(this.accountDAO_.getAccounts(arr), (data) => {
+                        data.forEach((content) => {
+                            const index = this.dataStore_.accountsList.findIndex((el) => el.name === content.data().name) 
+                            if(index !== -1)
+                            {
+                                this.dataStore_.accountsList[index] = new DBObject<Account>(content.data() as Account, content.id)
+                            }
+                            else
+                            {
+                                this.dataStore_.accountsList.push( new DBObject<Account>(content.data() as Account, content.id) )
+                            }
+                        })
+
+                        if(this.dataStore_.length !== 0)
                         {
-                            this.dataStore_.accountsList[index] = new DBObject<Account>(content.data() as Account, content.id)
+                            this.dataStore_.currentAccount = this.dataStore_.accountsList[0]
+                            this.syncCurrentAccount(callback)
                         }
                         else
                         {
-                            this.dataStore_.accountsList.push( new DBObject<Account>(content.data() as Account, content.id) )
+                            // Notify listening component that the load process is over.
+                            callback()
                         }
-                    })
+                })
 
-                    if(this.dataStore_.length !== 0)
-                    {
-                        this.dataStore_.currentAccount = this.dataStore_.accountsList[0]
-                        this.syncCurrentAccount(callback)
-                    }
-                    else
-                    {
-                        // Notify listening component that the load process is over.
-                        callback()
-                    }
-            })
+            }
+            else
+            {
+                // Notify listening component that the load process is over.
+                callback()
+            }
+
         })
     }
 
