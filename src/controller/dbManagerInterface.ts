@@ -16,7 +16,7 @@ export abstract class dbManagerInterface
 {
     public abstract addAccount(account:Account, categories:Category[]) : boolean;
 
-    public abstract addUser(userUID:string, userName:string) : string;
+    public abstract addUser(userUID:string, userName:string, email:string) : string;
 
     public abstract synchronizeUserData(userUID:string);
 
@@ -64,10 +64,11 @@ class dbManagerInterfaceImpl implements dbManagerInterface
         return true
     }
 
-    addUser(userUID:string, userName:string) : string
+    addUser(userUID:string, userName:string, email:string) : string
     {
         const usr = new UserImpl as User;
         usr.name = userName;
+        usr.email = email;
 
         return this.userDAO_.addUser(userUID, usr);    
     }

@@ -1,8 +1,16 @@
 <template>
-  <router-view/>
+  <div class ="background d-flex justify-center">
+    <router-view class="background"/>
+  </div>
 </template>
 
 <style>
+.background {
+  height:100vh;
+  width: 100lvw;
+  background-color: rgb(var(--v-theme-background));
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -24,3 +32,9 @@ nav a.router-link-exact-active {
   color: #42b983;
 }
 </style>
+
+<script setup lang="ts">
+
+  // screen.orientation.lock("portrait-primary");
+
+</script>

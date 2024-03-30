@@ -141,6 +141,7 @@ export interface User extends DBItem
 {
     accounts:AccountLink[]
     name:string
+    email:string
     timestamp:any
 }
 
@@ -148,12 +149,14 @@ export class UserImpl implements User
 {
     accounts:AccountLink[]
     name:string
+    email:string
     timestamp:any
 
     constructor()
     {
         this.accounts = new Array<AccountLink>()
         this.name = ""
+        this.email = ""
         this.timestamp = null
     }
 }

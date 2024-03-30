@@ -35,6 +35,7 @@ export class DataSyncManager
         this.checkAndInitialize()
 
         // Get User data :
+        console.log("Loading " + this.globalStore_.auth_userid)
         this.userSubscription_ = onSnapshot( this.userDAO_.getUser(this.globalStore_.auth_userid), (snapshot) => {
 
             this.dataStore_.currentUser.value = snapshot.data()

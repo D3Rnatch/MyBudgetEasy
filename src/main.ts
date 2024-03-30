@@ -36,6 +36,26 @@ const firebaseConfig = {
   appId: "1:616720153121:web:6a62334dc970a329548160"
 
 };
+/*
+ */
+const myCustomLightTheme: ThemeDefinition = {
+  dark: false,
+  colors: {
+    background: '#112B33', //
+    surface: '#BDD4DB',
+    //'on-background': '#494E4F',
+    primary: '#1A818F',
+    'primary-darken-1': '#14616C',
+    'primary-lighten-1': '#6A9EAE',
+    'primary-lighten-2': '#8EB1B8',
+    'primary-lighten-3': '#7EDBE7',
+    'on-primary' :'#ffffff',
+    secondary: '#03DAC6',
+    'secondary-darken-1': '#018786',
+    error: '#DF3939',
+    info: '#3CDF39',
+  },
+}
   
 const firebaseApp = initializeApp(firebaseConfig)
 
@@ -49,6 +69,12 @@ const vuetify = createVuetify({
         defaultSet: 'mdi'
     },
     blueprint: md3,
+    theme: {
+      defaultTheme: 'myCustomLightTheme',
+      themes: {
+        myCustomLightTheme,
+      },
+    }
 })
 
 const app = createApp(App)
