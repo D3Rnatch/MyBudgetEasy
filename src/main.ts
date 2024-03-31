@@ -45,6 +45,7 @@ const myCustomLightTheme: ThemeDefinition = {
     surface: '#BDD4DB',
     //'on-background': '#494E4F',
     primary: '#1A818F',
+    'primary-darken-2': '#0A1A1F',
     'primary-darken-1': '#14616C',
     'primary-lighten-1': '#6A9EAE',
     'primary-lighten-2': '#8EB1B8',

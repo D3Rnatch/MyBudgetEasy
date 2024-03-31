@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import RegisterView from '../views/RegisterView.vue'
 import WalletListView from '../views/WalletListView.vue'
+import CreateWalletView from '../views/CreateWalletView.vue'
 
 /*
  - Start: LoginVue
@@ -27,13 +28,9 @@ const routes: Array<RouteRecordRaw> = [
     component: WalletListView
   },
   {
-    path: '/account',
-    name: 'account',
-    beforeEnter: (to, from) => {
-      // reject the navigation
-      return true
-    },
-    component: () => import(/* webpackChunkName: "account" */ '../views/CreateAccountView.vue')
+    path: '/createwallet',
+    name: 'createwallet',
+    component: CreateWalletView
   },
   {
     path: '/account/dashboard',

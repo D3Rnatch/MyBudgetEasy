@@ -1,4 +1,5 @@
 <template>
+<v-main>
     <v-container>
         <v-row>
             <v-spacer></v-spacer>
@@ -91,6 +92,7 @@
         </v-row>
 
     </v-container>
+</v-main>
 </template>
 
 <script setup lang="ts">

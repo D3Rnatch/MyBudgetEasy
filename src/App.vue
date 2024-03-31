@@ -1,7 +1,7 @@
 <template>
-  <div class ="background d-flex justify-center">
-    <router-view class="background"/>
-  </div>
+  <v-app full-height>
+    <router-view/>
+  </v-app>
 </template>
 
 <style>

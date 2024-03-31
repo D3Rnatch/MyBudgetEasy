@@ -1,5 +1,5 @@
 <template>
-    <v-card
+    <!--<v-card
         color="background"
     >
         <v-toolbar
@@ -98,7 +98,102 @@
 
         </v-container>
 
-    </v-card>
+    </v-card> -->
+
+    <v-app-bar :elevation="7" color="primary">
+      <template v-slot:prepend>
+        <v-btn icon @click="exitWithoutSaving">
+          <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
+      </template>
+      <v-app-bar-title> Account Creation</v-app-bar-title>
+    </v-app-bar>
+    <v-main>
+        <v-container>
+            <v-row justify="center">
+                <v-spacer></v-spacer>
+                <v-col cols="8">
+                    <v-text-field
+                        v-model="userName"
+                        required
+                        clearable
+                        clear-icon="mdi-close"
+                        variant="solo-filled"
+                        label="Username"
+                        bg-color="primary-lighten-1"
+                        density="compact"
+                        rounded
+                        prepend-inner-icon="mdi-account-outline"
+                        @click:control="resetError"
+                    ></v-text-field>
+                </v-col>
+                <v-spacer></v-spacer>
+            </v-row>
+            <v-row justify="center">
+                <v-spacer></v-spacer>
+                <v-col cols="8">
+                    <v-text-field
+                        v-model="email"
+                        required
+                        clearable
+                        clear-icon="mdi-close"
+                        variant="solo-filled"
+                        label="Email"
+                        bg-color="primary-lighten-1"
+                        density="compact"
+                        rounded
+                        prepend-inner-icon="mdi-email-outline"
+                        @click:control="resetError"
+                    ></v-text-field>
+                </v-col>
+                <v-spacer></v-spacer>
+            </v-row>
+            <v-row justify="center">
+                <v-spacer></v-spacer>
+                <v-col cols="8">
+                    <v-text-field
+                        v-model="password"
+                        required
+                        clearable
+                        clear-icon="mdi-close"
+                        variant="solo-filled"
+                        label="Password"
+                        type="password"
+                        bg-color="primary-lighten-1"
+                        density="compact"
+                        rounded
+                        prepend-inner-icon="mdi-lock-outline"
+                        @click:control="resetError"
+
+                    ></v-text-field>
+                </v-col>
+                <v-spacer></v-spacer>
+            </v-row>
+            <v-row>
+                <v-spacer></v-spacer>
+                <v-col>
+                    <v-btn
+                        class="mt-2 font-size:24px; font-weight-bold font-capitalize elevation-8 ma-2"
+                        text="save"
+                        @click="createAccount"
+                    ></v-btn>
+                </v-col>
+                <v-spacer></v-spacer>
+            </v-row>
+
+            <v-row v-if="alert">
+                <v-col>
+                    <v-alert
+                        text="Unable to create account, please try again."
+                        type="error"
+                    ></v-alert>
+                </v-col>
+            </v-row>
+
+            </v-container>
+
+    </v-main>
+
 </template>
 
 <style>

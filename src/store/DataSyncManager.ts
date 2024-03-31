@@ -38,7 +38,7 @@ export class DataSyncManager
         console.log("Loading " + this.globalStore_.auth_userid)
         this.userSubscription_ = onSnapshot( this.userDAO_.getUser(this.globalStore_.auth_userid), (snapshot) => {
 
-            this.dataStore_.currentUser.value = snapshot.data()
+            this.dataStore_.currentUser = snapshot.data()
 
             const arr:string[] = []
             snapshot.data().accounts.forEach((account) => {
@@ -48,6 +48,7 @@ export class DataSyncManager
             if(snapshot.data().accounts.length)
             {
                 this.accountsSubscription_ = onSnapshot(this.accountDAO_.getAccounts(arr), (data) => {
+                        this.dataStore_.accountsList = new Array<DBObject<Account>>()
                         data.forEach((content) => {
                             const index = this.dataStore_.accountsList.findIndex((el) => el.name === content.data().name) 
                             if(index !== -1)
@@ -166,7 +167,6 @@ export class DataSyncManager
         this.expensesSubscription_()
         this.expensesSubscription_ = null
     }
-
 
     public addExpenseToCurrentAccount(expense:ExpenseItem)
     {
